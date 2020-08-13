@@ -77,6 +77,11 @@ return [
     ],
 
     /*
+     * When set to true, the model will allow set multiple roles
+     */
+    'model_has_multiple_roles' => true,
+
+    /*
      * When set to true, the required permission names are added to the exception
      * message. This could be considered an information leak in some contexts, so
      * the default setting is false here for optimum safety.

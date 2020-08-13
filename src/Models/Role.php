@@ -22,8 +22,6 @@ class Role extends Model implements RoleContract
 
     public function __construct(array $attributes = [])
     {
-        $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
-
         parent::__construct($attributes);
 
         $this->setTable(config('permission.table_names.roles'));
@@ -54,12 +52,11 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * A role belongs to some users of the model associated with its guard.
+     * A role belongs to some users of the model.
      */
     public function users(): MorphToMany
     {
         return $this->morphedByMany(
-            getModelForGuard($this->attributes['guard_name']),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
