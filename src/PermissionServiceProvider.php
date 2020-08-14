@@ -14,15 +14,9 @@ class PermissionServiceProvider extends ServiceProvider
 {
     public function boot(PermissionRegistrar $permissionLoader, Filesystem $filesystem)
     {
-        if (function_exists('config_path')) { // function not available and 'publish' not relevant in Lumen
-            $this->publishes([
-                __DIR__.'/../config/permission.php' => config_path('permission.php'),
-            ], 'config');
-
-            $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
-            ], 'migrations');
-        }
+        // Please copy files manually
+        // config/permission.php
+        // database/migrations/create_permission_tables.php.stub
 
         $this->registerMacroHelpers();
 
@@ -92,22 +86,5 @@ class PermissionServiceProvider extends ServiceProvider
 
             return $this;
         });
-    }
-
-    /**
-     * Returns existing migration file if found, else uses the current timestamp.
-     *
-     * @param Filesystem $filesystem
-     * @return string
-     */
-    protected function getMigrationFileName(Filesystem $filesystem): string
-    {
-        $timestamp = date('Y_m_d_His');
-
-        return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
-            ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
-            ->first();
     }
 }

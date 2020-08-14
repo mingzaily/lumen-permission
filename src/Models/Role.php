@@ -39,7 +39,7 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * A role may be given various permissions.
+     * A role may be has any permissions.
      */
     public function permissions(): BelongsToMany
     {

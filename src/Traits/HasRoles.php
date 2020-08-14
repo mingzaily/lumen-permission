@@ -37,9 +37,9 @@ trait HasRoles
     /**
      * A model may have multiple roles.
      *
-     * @return BelongsToMany
+     * @return Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function roles(): BelongsToMany
+    public function roles(): MorphToMany
     {
         return $this->morphToMany(
             config('permission.models.role'),
@@ -48,41 +48,6 @@ trait HasRoles
             config('permission.column_names.model_morph_key'),
             'role_id'
         );
-    }
-
-    /**
-     * Scope the model query to certain roles only.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @param string $guard
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeRole(Builder $query, $roles, $guard = null): Builder
-    {
-        if ($roles instanceof Collection) {
-            $roles = $roles->all();
-        }
-
-        if (! is_array($roles)) {
-            $roles = [$roles];
-        }
-
-        $roles = array_map(function ($role) use ($guard) {
-            if ($role instanceof Role) {
-                return $role;
-            }
-
-            $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
-
-            return $this->getRoleClass()->{$method}($role, $guard);
-        }, $roles);
-
-        return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
-            $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($roles, 'id'));
-        });
     }
 
     /**
@@ -105,9 +70,6 @@ trait HasRoles
             })
             ->filter(function ($role) {
                 return $role instanceof Role;
-            })
-            ->each(function ($role) {
-                $this->ensureModelSharesGuard($role);
             })
             ->map->id
             ->all();
@@ -171,25 +133,20 @@ trait HasRoles
      * Determine if the model has (one of) the given role(s).
      *
      * @param string|int|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @param string|null $guard
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+    public function hasRole($roles): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+            return $this->roles->contains('name', $roles);
         }
 
         if (is_int($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
+            return $this->roles->contains('id', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -198,7 +155,7 @@ trait HasRoles
 
         if (is_array($roles)) {
             foreach ($roles as $role) {
-                if ($this->hasRole($role, $guard)) {
+                if ($this->hasRole($role)) {
                     return true;
                 }
             }
@@ -206,13 +163,13 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        return $roles->intersect($this->roles)->isNotEmpty();
     }
 
     /**
      * Determine if the model has any of the given role(s).
      *
-     * Alias to hasRole() but without Guard controls
+     * Alias to hasRole()
      *
      * @param string|int|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
      *
@@ -227,19 +184,16 @@ trait HasRoles
      * Determine if the model has all of the given role(s).
      *
      * @param  string|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
-     * @param  string|null  $guard
      * @return bool
      */
-    public function hasAllRoles($roles, string $guard = null): bool
+    public function hasAllRoles($roles): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+            return $this->roles->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
@@ -250,18 +204,7 @@ trait HasRoles
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect(
-            $guard
-                ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()) == $roles;
-    }
-
-    /**
-     * Return all permissions directly coupled to the model.
-     */
-    public function getDirectPermissions(): Collection
-    {
-        return $this->permissions;
+        return $roles->intersect($this->getRoleNames()) == $roles;
     }
 
     public function getRoleNames(): Collection
@@ -274,11 +217,11 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return $roleClass->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role);
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role);
         }
 
         return $role;

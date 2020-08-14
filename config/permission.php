@@ -97,12 +97,6 @@ return [
 
     'display_role_in_exception' => false,
 
-    /*
-     * By default wildcard permission lookups are disabled.
-     */
-
-    'enable_wildcard_permission' => false,
-
     'cache' => [
 
         /*
@@ -116,7 +110,7 @@ return [
          * The cache key used to store all permissions.
          */
 
-        'key' => 'Mingzaily.permission.cache',
+        'key' => 'mingzaily.permission.cache',
 
         /*
          * When checking for a permission against a model by passing a Permission

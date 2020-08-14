@@ -89,6 +89,7 @@ class PermissionRegistrar
             if (method_exists($user, 'checkPermissionTo')) {
                 return $user->checkPermissionTo($ability) ?: null;
             }
+            return null;
         });
 
         return true;

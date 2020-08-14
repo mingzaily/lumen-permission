@@ -45,7 +45,7 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * A permission can be applied to roles.
+     * A permission can be belongs to any roles.
      */
     public function roles(): BelongsToMany
     {

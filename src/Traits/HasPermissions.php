@@ -2,16 +2,12 @@
 
 namespace Mingzaily\Permission\Traits;
 
-use Mingzaily\Permission\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
-use Mingzaily\Permission\WildcardPermission;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
-use Mingzaily\Permission\Exceptions\WildcardPermissionInvalidArgument;
 
 trait HasPermissions
 {
@@ -37,19 +33,13 @@ trait HasPermissions
         return $this->permissionClass;
     }
 
-    /**
-     * A model may have multiple direct permissions.
-     */
-    public function permissions(): MorphToMany
-    {
-        return $this->morphToMany(
-            config('permission.models.permission'),
-            'model',
-            config('permission.table_names.model_has_permissions'),
-            config('permission.column_names.model_morph_key'),
-            'permission_id'
-        );
-    }
+//    /**
+//     * A model may have multiple direct permissions.
+//     */
+//    public function permissions(): BelongsToMany
+//    {
+//        return $this->roles()->permissions();
+//    }
 
     /**
      * Scope the model query to certain permissions only.
@@ -97,7 +87,7 @@ trait HasPermissions
                 return $permission;
             }
 
-            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
+            return $this->getPermissionClass()->findByName($permission);
         }, $permissions);
     }
 
@@ -105,30 +95,23 @@ trait HasPermissions
      * Determine if the model may perform the given permission.
      *
      * @param string|int|\Mingzaily\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
      *
      * @return bool
      * @throws PermissionDoesNotExist
      */
-    public function hasPermissionTo($permission, $guardName = null): bool
+    public function hasPermissionTo($permission): bool
     {
-        if (config('permission.enable_wildcard_permission', false)) {
-            return $this->hasWildcardPermission($permission, $guardName);
-        }
-
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
             $permission = $permissionClass->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
+                $permission
             );
         }
 
         if (is_int($permission)) {
             $permission = $permissionClass->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName()
+                $permission
             );
         }
 
@@ -136,69 +119,26 @@ trait HasPermissions
             throw new PermissionDoesNotExist;
         }
 
-        return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
+        return $this->hasPermissionViaRole($permission);
     }
 
-    /**
-     * Validates a wildcard permission against all permissions of a user.
-     *
-     * @param string|int|\Mingzaily\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
-     *
-     * @return bool
-     */
-    protected function hasWildcardPermission($permission, $guardName = null): bool
-    {
-        $guardName = $guardName ?? $this->getDefaultGuardName();
-
-        if (is_int($permission)) {
-            $permission = $this->getPermissionClass()->findById($permission, $guardName);
-        }
-
-        if ($permission instanceof Permission) {
-            $permission = $permission->name;
-        }
-
-        if (! is_string($permission)) {
-            throw WildcardPermissionInvalidArgument::create();
-        }
-
-        foreach ($this->getAllPermissions() as $userPermission) {
-            if ($guardName !== $userPermission->guard_name) {
-                continue;
-            }
-
-            $userPermission = new WildcardPermission($userPermission->name);
-
-            if ($userPermission->implies($permission)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @deprecated since 2.35.0
-     * @alias of hasPermissionTo()
-     */
-    public function hasUncachedPermissionTo($permission, $guardName = null): bool
-    {
-        return $this->hasPermissionTo($permission, $guardName);
-    }
 
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
-     * @param string|int|\Mingzaily\Permission\Contracts\Permission $permission
-     * @param string|null $guardName
+     * @param string|array|int|\Mingzaily\Permission\Contracts\Permission $permission
      *
      * @return bool
      */
-    public function checkPermissionTo($permission, $guardName = null): bool
+    public function checkPermissionTo($permission): bool
     {
+        if (is_array($permission)) {
+            $permission = $this->getPermissionClass()
+                ->findByRouteAndMethod($permission['route'], $permission['method']);
+        }
+
         try {
-            return $this->hasPermissionTo($permission, $guardName);
+            return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
@@ -259,33 +199,6 @@ trait HasPermissions
     }
 
     /**
-     * Determine if the model has the given permission.
-     *
-     * @param string|int|\Mingzaily\Permission\Contracts\Permission $permission
-     *
-     * @return bool
-     * @throws PermissionDoesNotExist
-     */
-    public function hasDirectPermission($permission): bool
-    {
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
-        }
-
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
-        }
-
-        return $this->permissions->contains('id', $permission->id);
-    }
-
-    /**
      * Return all the permissions the model has via roles.
      */
     public function getPermissionsViaRoles(): Collection
@@ -297,18 +210,11 @@ trait HasPermissions
     }
 
     /**
-     * Return all the permissions the model has, both directly and via roles.
+     * Return all the permissions the model has via roles.
      */
     public function getAllPermissions(): Collection
     {
-        /** @var Collection $permissions */
-        $permissions = $this->permissions;
-
-        if ($this->roles) {
-            $permissions = $permissions->merge($this->getPermissionsViaRoles());
-        }
-
-        return $permissions->sort()->values();
+        return $this->getPermissionsViaRoles()->sort()->values();
     }
 
     /**
@@ -331,9 +237,6 @@ trait HasPermissions
             })
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
-            })
-            ->each(function ($permission) {
-                $this->ensureModelSharesGuard($permission);
             })
             ->map->id
             ->all();
@@ -411,43 +314,20 @@ trait HasPermissions
         $permissionClass = $this->getPermissionClass();
 
         if (is_numeric($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findById($permissions);
         }
 
         if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+            return $permissionClass->findByName($permissions);
         }
 
         if (is_array($permissions)) {
             return $permissionClass
                 ->whereIn('name', $permissions)
-                ->whereIn('guard_name', $this->getGuardNames())
                 ->get();
         }
 
         return $permissions;
-    }
-
-    /**
-     * @param \Mingzaily\Permission\Contracts\Permission|\Mingzaily\Permission\Contracts\Role $roleOrPermission
-     *
-     * @throws \Mingzaily\Permission\Exceptions\GuardDoesNotMatch
-     */
-    protected function ensureModelSharesGuard($roleOrPermission)
-    {
-        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
-            throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
-        }
-    }
-
-    protected function getGuardNames(): Collection
-    {
-        return Guard::getNames($this);
-    }
-
-    protected function getDefaultGuardName(): string
-    {
-        return Guard::getDefaultName($this);
     }
 
     /**
