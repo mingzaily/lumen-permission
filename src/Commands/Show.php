@@ -10,10 +10,9 @@ use Mingzaily\Permission\Contracts\Permission as PermissionContract;
 class Show extends Command
 {
     protected $signature = 'permission:show
-            {guard? : The name of the guard}
             {style? : The display style (default|borderless|compact|box)}';
 
-    protected $description = 'Show a table of roles and permissions per guard';
+    protected $description = 'Show a table of roles and permissions';
 
     public function handle()
     {
@@ -21,34 +20,24 @@ class Show extends Command
         $roleClass = app(RoleContract::class);
 
         $style = $this->argument('style') ?? 'default';
-        $guard = $this->argument('guard');
 
-        if ($guard) {
-            $guards = Collection::make([$guard]);
-        } else {
-            $guards = $permissionClass::pluck('guard_name')->merge($roleClass::pluck('guard_name'))->unique();
-        }
+        $roles = $roleClass::orderBy('name')->get()->mapWithKeys(function ($role) {
+            return [$role->name => $role->permissions->pluck('name')];
+        });
 
-        foreach ($guards as $guard) {
-            $this->info("Guard: $guard");
+        $permissions = $permissionClass::orderBy('name')->pluck('name');
 
-            $roles = $roleClass::whereGuardName($guard)->orderBy('name')->get()->mapWithKeys(function ($role) {
-                return [$role->name => $role->permissions->pluck('name')];
-            });
+        $body = $permissions->map(function ($permission) use ($roles) {
+            return $roles->map(function (Collection $role_permissions) use ($permission) {
+                return $role_permissions->contains($permission) ? ' ✔' : ' ·';
+            })->prepend($permission);
+        });
 
-            $permissions = $permissionClass::whereGuardName($guard)->orderBy('name')->pluck('name');
+        $this->table(
+            $roles->keys()->prepend('')->toArray(),
+            $body->toArray(),
+            $style
+        );
 
-            $body = $permissions->map(function ($permission) use ($roles) {
-                return $roles->map(function (Collection $role_permissions) use ($permission) {
-                    return $role_permissions->contains($permission) ? ' ✔' : ' ·';
-                })->prepend($permission);
-            });
-
-            $this->table(
-                $roles->keys()->prepend('')->toArray(),
-                $body->toArray(),
-                $style
-            );
-        }
     }
 }

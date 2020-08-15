@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 trait HasPermissions
@@ -33,13 +32,24 @@ trait HasPermissions
         return $this->permissionClass;
     }
 
-//    /**
-//     * A model may have multiple direct permissions.
-//     */
-//    public function permissions(): BelongsToMany
-//    {
-//        return $this->roles()->permissions();
-//    }
+    /**
+     * A model may have multiple roles.
+     *
+     * @return Illuminate\Support\Collection
+     */
+    public function permissions(): Collection
+    {
+        $permissions = $this->getPermissions()
+                ->map(function ($permission) {
+                    if ($permission->level == 0) {
+                        return $permission;
+                    }
+                    return false;
+                })
+                ->all();
+        dd($permissions);
+        return $this->getPermissions();
+    }
 
     /**
      * Scope the model query to certain permissions only.
@@ -115,6 +125,12 @@ trait HasPermissions
             );
         }
 
+        if (is_array($permission)) {
+            $permission = $permissionClass->findByRouteAndMethod(
+                $permission
+            );
+        }
+
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
@@ -132,11 +148,6 @@ trait HasPermissions
      */
     public function checkPermissionTo($permission): bool
     {
-        if (is_array($permission)) {
-            $permission = $this->getPermissionClass()
-                ->findByRouteAndMethod($permission['route'], $permission['method']);
-        }
-
         try {
             return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
@@ -201,20 +212,12 @@ trait HasPermissions
     /**
      * Return all the permissions the model has via roles.
      */
-    public function getPermissionsViaRoles(): Collection
+    public function getPermissions(): Collection
     {
         return $this->loadMissing('roles', 'roles.permissions')
             ->roles->flatMap(function ($role) {
                 return $role->permissions;
             })->sort()->values();
-    }
-
-    /**
-     * Return all the permissions the model has via roles.
-     */
-    public function getAllPermissions(): Collection
-    {
-        return $this->getPermissionsViaRoles()->sort()->values();
     }
 
     /**
@@ -265,20 +268,6 @@ trait HasPermissions
         $this->forgetCachedPermissions();
 
         return $this;
-    }
-
-    /**
-     * Remove all current permissions and set the given ones.
-     *
-     * @param string|array|\Mingzaily\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
-     *
-     * @return $this
-     */
-    public function syncPermissions(...$permissions)
-    {
-        $this->permissions()->detach();
-
-        return $this->givePermissionTo($permissions);
     }
 
     /**
@@ -336,41 +325,5 @@ trait HasPermissions
     public function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
-    /**
-     * Check if the model has All of the requested Direct permissions.
-     * @param array ...$permissions
-     * @return bool
-     */
-    public function hasAllDirectPermissions(...$permissions): bool
-    {
-        $permissions = collect($permissions)->flatten();
-
-        foreach ($permissions as $permission) {
-            if (! $this->hasDirectPermission($permission)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the model has Any of the requested Direct permissions.
-     * @param array ...$permissions
-     * @return bool
-     */
-    public function hasAnyDirectPermission(...$permissions): bool
-    {
-        $permissions = collect($permissions)->flatten();
-
-        foreach ($permissions as $permission) {
-            if ($this->hasDirectPermission($permission)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

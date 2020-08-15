@@ -38,14 +38,13 @@ interface Permission
     /**
      * Find a permission by its route and method
      *
-     * @param string $route
-     * @param string $method
+     * @param array $permission
      *
      * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
      *
      * @return \Mingzaily\Permission\Contracts\Permission
      */
-    public static function findByRouteAndMethod(string $route, string $method): self;
+    public static function findByRouteAndMethod(array $permission): self;
 
     /**
      * Find or Create a permission by its name and guard name.

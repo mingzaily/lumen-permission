@@ -5,6 +5,7 @@ namespace Mingzaily\Permission\Traits;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
+use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -53,19 +54,20 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Mingzaily\Permission\Contracts\Role ...$roles
+     * @param string|\Mingzaily\Permission\Contracts\Role ...$roles
      *
      * @return $this
      */
     public function assignRole(...$roles)
     {
+        $this->checkMultipleRole($roles);
+
         $roles = collect($roles)
             ->flatten()
             ->map(function ($role) {
                 if (empty($role)) {
                     return false;
                 }
-
                 return $this->getStoredRole($role);
             })
             ->filter(function ($role) {
@@ -81,7 +83,6 @@ trait HasRoles
             $model->load('roles');
         } else {
             $class = \get_class($model);
-
             $class::saved(
                 function ($object) use ($roles, $model) {
                     static $modelLastFiredOn;
@@ -247,5 +248,21 @@ trait HasRoles
         }
 
         return explode('|', trim($pipeString, $quoteCharacter));
+    }
+
+    /**
+     * @param string|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @return array|Collection|Role|string
+     */
+    protected function checkMultipleRole($roles)
+    {
+        $roles = collect($roles)->flatten();
+        if (is_array($roles)
+            && count($roles) > 1
+            && !config('permission.model_has_multiple_roles')) {
+            throw RoleAlreadyExists::assign();
+        }
+
+        return $roles;
     }
 }

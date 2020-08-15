@@ -25,11 +25,19 @@ Same as [spatie/laravel-permission](https://github.com/spatie/laravel-permission
 
 #### Lumen
 
-- `composer require mingzaily/laravel-permission`
-- `php artisan vendor:publish --provider="Mingzaily\Permission\PermissionServiceProvider" --tag="migrations"`
-- `php artisan migrate`
-- `php artisan vendor:publish --provider="Mingzaily\Permission\PermissionServiceProvider" --tag="config"`
-
+First, install from Composer
+```shell script
+composer require mingzaily/lumen-permission
+```
+Copy the files
+```shell script
+cp vendor/mingzaily/lumen-permission/config/permission.php config/permission.php
+cp vendor/mingzaily/lumen-permission/database/migrations/create_permission_tables.php.stub database/migrations/2020_0 1_01_000000_create_permission_tables.php
+```
+You will also need the config/auth.php file. If you don't already have it, copy it from the vendor folder:
+```shell script
+cp vendor/laravel/lumen-framework/config/auth.php config/auth.php
+```
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

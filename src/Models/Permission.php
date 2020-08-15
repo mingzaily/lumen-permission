@@ -2,7 +2,6 @@
 
 namespace Mingzaily\Permission\Models;
 
-use Mingzaily\Permission\Guard;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +19,8 @@ class Permission extends Model implements PermissionContract
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
+
+    protected $hidden = ['pivot'];
 
     public function __construct(array $attributes = [])
     {
@@ -97,17 +98,16 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * @param string $route
-     * @param string $method
+     * @param array $permission
      *
      * @return \Mingzaily\Permission\Contracts\Permission
      */
-    public static function findByRouteAndMethod(string $route, string $method): PermissionContract
+    public static function findByRouteAndMethod(array $permission): PermissionContract
     {
-        $permission = static::getPermissions(['route' => $route, 'method' => $method])->first();
+        $permission = static::getPermissions(['route' => $permission['route'], 'method' => $permission['method']])->first();
 
         if (! $permission) {
-            throw PermissionDoesNotExist::withRouteAndMethod($route, $method);
+            throw PermissionDoesNotExist::withRouteAndMethod($permission['route'], $permission['method']);
         }
 
         return $permission;
