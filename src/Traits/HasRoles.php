@@ -2,6 +2,7 @@
 
 namespace Mingzaily\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
@@ -12,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 trait HasRoles
 {
 //    use HasPermissions;
-
     private $roleClass;
 
     public static function bootHasRoles()
@@ -49,6 +49,17 @@ trait HasRoles
             config('permission.column_names.model_morph_key'),
             'role_id'
         );
+    }
+
+    /**
+     * Return a model have one of the role.
+     * alias roles()
+     *
+     * @return \Mingzaily\Permission\Models\Role
+     */
+    public function getFirstRole(): \Mingzaily\Permission\Models\Role
+    {
+        return $this->roles()->first();
     }
 
     /**

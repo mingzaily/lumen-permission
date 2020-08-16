@@ -279,6 +279,17 @@ trait HasPermissions
         return $this->permissions->pluck('name');
     }
 
+    public function getPermissionDisplayName(): Collection
+    {
+        return $this->permissions->pluck('display_name');
+    }
+
+    public function getPermissionRouteMethod(): Collection
+    {
+        //todo
+        return $this->permissions->pluck('route', 'method');
+    }
+
     /**
      * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
