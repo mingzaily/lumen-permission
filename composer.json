@@ -41,10 +41,7 @@
     "autoload": {
         "psr-4": {
             "Mingzaily\\Permission\\": "src"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

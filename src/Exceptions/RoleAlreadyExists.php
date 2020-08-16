@@ -8,11 +8,16 @@ class RoleAlreadyExists extends InvalidArgumentException
 {
     public static function create(string $roleName)
     {
-        return new static("A role `{$roleName}`.");
+        return new static("A role `{$roleName}` exits.");
     }
 
     public static function assign()
     {
-        return new static("Non support multiple_roles. You can change config in permission.php");
+        return new static("Non support multiple roles");
+    }
+
+    public static function assignExits(string $roleName)
+    {
+        return new static("Model already has a role `{$roleName}`");
     }
 }

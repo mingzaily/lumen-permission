@@ -2,17 +2,38 @@
 
 namespace Mingzaily\Permission\Models;
 
-use Mingzaily\Permission\Guard;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\Traits\HasPermissions;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
-use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Contracts\Role as RoleContract;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * Mingzaily\Permission\Models\Role
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $display_name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Permission[] $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereDisplayName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Role extends Model implements RoleContract
 {
     use HasPermissions;
@@ -57,7 +78,7 @@ class Role extends Model implements RoleContract
     public function users(): MorphToMany
     {
         return $this->morphedByMany(
-            getUserModel(),
+            config("auth.providers.users.model"),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
@@ -121,15 +142,9 @@ class Role extends Model implements RoleContract
      * @param string|Permission $permission
      *
      * @return bool
-     *
-     * @throws \Mingzaily\Permission\Exceptions\GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {
-        if (config('permission.enable_wildcard_permission', false)) {
-            return $this->hasWildcardPermission($permission, $this->getDefaultGuardName());
-        }
-
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {

@@ -2,16 +2,16 @@
 
 namespace Mingzaily\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
-use Illuminate\Database\Eloquent\Builder;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
 {
-    use HasPermissions;
+//    use HasPermissions;
 
     private $roleClass;
 
@@ -38,7 +38,7 @@ trait HasRoles
     /**
      * A model may have multiple roles.
      *
-     * @return Illuminate\Database\Eloquent\Relations\MorphToMany
+     * @return MorphToMany
      */
     public function roles(): MorphToMany
     {
@@ -54,16 +54,13 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param string|\Mingzaily\Permission\Contracts\Role ...$roles
+     * @param string|Role ...$roles
      *
      * @return $this
      */
     public function assignRole(...$roles)
     {
-        $this->checkMultipleRole($roles);
-
-        $roles = collect($roles)
-            ->flatten()
+        $roles = $this->checkMultipleRole($roles)
             ->map(function ($role) {
                 if (empty($role)) {
                     return false;
@@ -103,7 +100,9 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|\Mingzaily\Permission\Contracts\Role $role
+     * @param string|Role $role
+     *
+     * @return $this
      */
     public function removeRole($role)
     {
@@ -119,7 +118,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|\Mingzaily\Permission\Contracts\Role|string  ...$roles
+     * @param  array|Role|string  ...$roles
      *
      * @return $this
      */
@@ -133,7 +132,8 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|Role|Collection $roles
+     *
      * @return bool
      */
     public function hasRole($roles): bool
@@ -172,7 +172,7 @@ trait HasRoles
      *
      * Alias to hasRole()
      *
-     * @param string|int|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|Role|Collection $roles
      *
      * @return bool
      */
@@ -184,7 +184,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|array|Role|Collection $roles
      * @return bool
      */
     public function hasAllRoles($roles): bool
@@ -251,16 +251,21 @@ trait HasRoles
     }
 
     /**
-     * @param string|array|\Mingzaily\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
-     * @return array|Collection|Role|string
+     * @param string|array|Role|Collection $roles
+     * @return Collection
      */
-    protected function checkMultipleRole($roles)
+    protected function checkMultipleRole($roles): Collection
     {
         $roles = collect($roles)->flatten();
-        if (is_array($roles)
-            && count($roles) > 1
+
+        if ($roles->count() > 1
             && !config('permission.model_has_multiple_roles')) {
             throw RoleAlreadyExists::assign();
+        }
+
+        if ($this->roles->count() >= 1
+            && !config('permission.model_has_multiple_roles')) {
+            throw RoleAlreadyExists::assignExits($this->roles[0]->name);
         }
 
         return $roles;

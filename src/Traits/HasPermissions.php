@@ -2,8 +2,10 @@
 
 namespace Mingzaily\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Mingzaily\Permission\Models\Role;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
@@ -33,29 +35,10 @@ trait HasPermissions
     }
 
     /**
-     * A model may have multiple roles.
-     *
-     * @return Illuminate\Support\Collection
-     */
-    public function permissions(): Collection
-    {
-        $permissions = $this->getPermissions()
-                ->map(function ($permission) {
-                    if ($permission->level == 0) {
-                        return $permission;
-                    }
-                    return false;
-                })
-                ->all();
-        dd($permissions);
-        return $this->getPermissions();
-    }
-
-    /**
      * Scope the model query to certain permissions only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Mingzaily\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -80,7 +63,7 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Mingzaily\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return array
      */
@@ -104,7 +87,7 @@ trait HasPermissions
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param string|int|\Mingzaily\Permission\Contracts\Permission $permission
+     * @param string|int|Permission $permission
      *
      * @return bool
      * @throws PermissionDoesNotExist
@@ -135,14 +118,14 @@ trait HasPermissions
             throw new PermissionDoesNotExist;
         }
 
-        return $this->hasPermissionViaRole($permission);
+        return $this->hasRole($permission->roles);
     }
 
 
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
-     * @param string|array|int|\Mingzaily\Permission\Contracts\Permission $permission
+     * @param string|array|int|Permission $permission
      *
      * @return bool
      */
@@ -198,21 +181,21 @@ trait HasPermissions
     }
 
     /**
-     * Determine if the model has, via roles, the given permission.
-     *
-     * @param \Mingzaily\Permission\Contracts\Permission $permission
-     *
-     * @return bool
+     * Return all the permissions the model has via roles.
      */
-    protected function hasPermissionViaRole(Permission $permission): bool
+    public function getAllPermissions(): Collection
     {
-        return $this->hasRole($permission->roles);
+//        return $this->loadMissing('roles', 'roles.permissions')
+//            ->roles->flatMap(function ($role) {
+//                return $role->permissions;
+//            })->sort()->values();
+        return $this->permissions;
     }
 
     /**
-     * Return all the permissions the model has via roles.
+     * Return all the tree permissions the model has via roles.
      */
-    public function getPermissions(): Collection
+    public function getTreePermissions(): Collection
     {
         return $this->loadMissing('roles', 'roles.permissions')
             ->roles->flatMap(function ($role) {
@@ -223,7 +206,7 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param string|array|\Mingzaily\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -235,7 +218,6 @@ trait HasPermissions
                 if (empty($permission)) {
                     return false;
                 }
-
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
@@ -247,6 +229,10 @@ trait HasPermissions
         $model = $this->getModel();
 
         if ($model->exists) {
+//            foreach ($this->roles as $role) {
+//                $role->permissions()->sync($permissions, false);
+//                $role->load('permissions');
+//            }
             $this->permissions()->sync($permissions, false);
             $model->load('permissions');
         } else {
@@ -273,7 +259,7 @@ trait HasPermissions
     /**
      * Revoke the given permission.
      *
-     * @param \Mingzaily\Permission\Contracts\Permission|\Mingzaily\Permission\Contracts\Permission[]|string|string[] $permission
+     * @param Permission|Permission[]|string|string[] $permission
      *
      * @return $this
      */
@@ -294,9 +280,9 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Mingzaily\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return \Mingzaily\Permission\Contracts\Permission|\Mingzaily\Permission\Contracts\Permission[]|\Illuminate\Support\Collection
+     * @return Permission|Permission[]|\Illuminate\Support\Collection
      */
     protected function getStoredPermission($permissions)
     {
@@ -308,6 +294,10 @@ trait HasPermissions
 
         if (is_string($permissions)) {
             return $permissionClass->findByName($permissions);
+        }
+
+        if (is_array($permissions) && isset($permissions['route']) && isset($permissions['method'])) {
+            return $permissionClass->findByRouteAndMethod($permissions);
         }
 
         if (is_array($permissions)) {

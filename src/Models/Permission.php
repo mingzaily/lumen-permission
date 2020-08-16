@@ -13,9 +13,40 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
 use Mingzaily\Permission\Contracts\Permission as PermissionContract;
 
+/**
+ * Mingzaily\Permission\Models\Permission
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $display_name
+ * @property string $route
+ * @property string $method
+ * @property int $pid
+ * @property int $weight
+ * @property int $level
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
+ * @property-read int|null $roles_count
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereDisplayName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission wherePid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereRoute($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereWeight($value)
+ * @mixin \Eloquent
+ */
 class Permission extends Model implements PermissionContract
 {
-    use HasRoles;
+//    use HasRoles;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
