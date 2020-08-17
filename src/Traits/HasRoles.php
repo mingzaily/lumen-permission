@@ -35,21 +35,21 @@ trait HasRoles
         return $this->roleClass;
     }
 
-    /**
-     * A model may have multiple roles.
-     *
-     * @return MorphToMany
-     */
-    public function roles(): MorphToMany
-    {
-        return $this->morphToMany(
-            config('permission.models.role'),
-            'model',
-            config('permission.table_names.model_has_roles'),
-            config('permission.column_names.model_morph_key'),
-            'role_id'
-        );
-    }
+//    /**
+//     * A model may have multiple roles.
+//     *
+//     * @return MorphToMany
+//     */
+//    public function roles(): MorphToMany
+//    {
+//        return $this->morphToMany(
+//            config('permission.models.role'),
+//            'model',
+//            config('permission.table_names.model_has_roles'),
+//            config('permission.column_names.model_morph_key'),
+//            'role_id'
+//        );
+//    }
 
     /**
      * Return a model have one of the role.
@@ -60,6 +60,17 @@ trait HasRoles
     public function getFirstRole(): \Mingzaily\Permission\Models\Role
     {
         return $this->roles()->first();
+    }
+
+    /**
+     * Return a model have all roles.
+     * alias roles()
+     *
+     * @return \Mingzaily\Permission\Models\Role
+     */
+    public function getAllRole(): \Mingzaily\Permission\Models\Role
+    {
+        return $this->roles;
     }
 
     /**

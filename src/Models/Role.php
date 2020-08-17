@@ -59,18 +59,18 @@ class Role extends Model implements RoleContract
         return static::query()->create($attributes);
     }
 
-    /**
-     * A role may be has any permissions.
-     */
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions'),
-            'role_id',
-            'permission_id'
-        );
-    }
+//    /**
+//     * A role may be has any permissions.
+//     */
+//    public function permissions(): BelongsToMany
+//    {
+//        return $this->belongsToMany(
+//            config('permission.models.permission'),
+//            config('permission.table_names.role_has_permissions'),
+//            'role_id',
+//            'permission_id'
+//        );
+//    }
 
     /**
      * A role belongs to some users of the model.
