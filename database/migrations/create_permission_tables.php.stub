@@ -26,9 +26,9 @@ class CreatePermissionTables extends Migration
             $table->string('display_name');
             $table->string('route');
             $table->string('method');
-            $table->unsignedBigInteger('pid')->default(0);
+            $table->unsignedBigInteger('pid')->nullable();
             $table->unsignedInteger('weight')->default(0);
-            $table->unsignedInteger('level')->default(1);
+            $table->unsignedSmallInteger('is_menu')->default(1);
             $table->timestamps();
 
             $table->index(['route', 'method'], 'permission_route_method_index');

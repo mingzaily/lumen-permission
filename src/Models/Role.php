@@ -3,13 +3,14 @@
 namespace Mingzaily\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Mingzaily\Permission\Contracts\Permission;
+use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 use Mingzaily\Permission\Traits\HasPermissions;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Contracts\Role as RoleContract;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Mingzaily\Permission\Models\Role
@@ -19,8 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $display_name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Permission[] $permissions
- * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role newModelQuery()
@@ -58,19 +57,6 @@ class Role extends Model implements RoleContract
 
         return static::query()->create($attributes);
     }
-
-//    /**
-//     * A role may be has any permissions.
-//     */
-//    public function permissions(): BelongsToMany
-//    {
-//        return $this->belongsToMany(
-//            config('permission.models.permission'),
-//            config('permission.table_names.role_has_permissions'),
-//            'role_id',
-//            'permission_id'
-//        );
-//    }
 
     /**
      * A role belongs to some users of the model.
@@ -139,7 +125,7 @@ class Role extends Model implements RoleContract
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param string|Permission $permission
+     * @param string|int|Permission|array $permission
      *
      * @return bool
      */
@@ -153,6 +139,14 @@ class Role extends Model implements RoleContract
 
         if (is_int($permission)) {
             $permission = $permissionClass->findById($permission);
+        }
+
+        if (is_array($permission) && isset($permission['route']) && isset($permission['method'])) {
+            $permission = $permissionClass->findByRouteAndMethod($permission);
+        }
+
+        if (! $permission instanceof Permission) {
+            throw new PermissionDoesNotExist;
         }
 
         return $this->permissions->contains('id', $permission->id);

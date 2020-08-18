@@ -85,11 +85,10 @@ class PermissionRegistrar
      */
     public function registerPermissions(): bool
     {
-        app(Gate::class)->before(function (Authorizable $user, string $ability) {
-            if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability) ?: null;
-            }
-            return null;
+        app(Gate::class)->define('hasPermission', function (Authorizable $user, string $ability) {
+            return $user->roles->map(function ($role) use ($ability) {
+                return $role->checkPermissionTo($ability) ?: null;
+            });
         });
 
         return true;

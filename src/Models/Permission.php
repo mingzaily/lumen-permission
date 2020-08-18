@@ -46,7 +46,6 @@ use Mingzaily\Permission\Contracts\Permission as PermissionContract;
  */
 class Permission extends Model implements PermissionContract
 {
-//    use HasRoles;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
@@ -90,6 +89,24 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
+     * Recursive hasMany Relationship with Unlimited Subcategories
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function children()
+    {
+        return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function childrenPermissions()
+    {
+        return $this->children()->with('childrenPermissions');
+    }
+
+    /**
      * Find a permission by its name (and optionally guardName).
      *
      * @param string $name
@@ -129,16 +146,16 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * @param array $permission
+     * @param array $ability
      *
      * @return \Mingzaily\Permission\Contracts\Permission
      */
-    public static function findByRouteAndMethod(array $permission): PermissionContract
+    public static function findByRouteAndMethod(array $ability): PermissionContract
     {
-        $permission = static::getPermissions(['route' => $permission['route'], 'method' => $permission['method']])->first();
+        $permission = static::getPermissions($ability)->first();
 
         if (! $permission) {
-            throw PermissionDoesNotExist::withRouteAndMethod($permission['route'], $permission['method']);
+            throw PermissionDoesNotExist::withRouteAndMethod($ability);
         }
 
         return $permission;

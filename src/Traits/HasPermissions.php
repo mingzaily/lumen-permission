@@ -5,11 +5,16 @@ namespace Mingzaily\Permission\Traits;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
-use Mingzaily\Permission\Models\Role;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
+/**
+ * Trait HasPermissions
+ * @package Mingzaily\Permission\Traits
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Permission[] $permissions
+ * @property-read int|null $permissions_count
+ */
 trait HasPermissions
 {
     private $permissionClass;
@@ -32,6 +37,19 @@ trait HasPermissions
         }
 
         return $this->permissionClass;
+    }
+
+    /**
+     * A role may be has any permissions.
+     */
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            config('permission.models.permission'),
+            config('permission.table_names.role_has_permissions'),
+            'role_id',
+            'permission_id'
+        );
     }
 
     /**
@@ -83,44 +101,6 @@ trait HasPermissions
             return $this->getPermissionClass()->findByName($permission);
         }, $permissions);
     }
-
-    /**
-     * Determine if the model may perform the given permission.
-     *
-     * @param string|int|Permission $permission
-     *
-     * @return bool
-     * @throws PermissionDoesNotExist
-     */
-    public function hasPermissionTo($permission): bool
-    {
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName(
-                $permission
-            );
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById(
-                $permission
-            );
-        }
-
-        if (is_array($permission)) {
-            $permission = $permissionClass->findByRouteAndMethod(
-                $permission
-            );
-        }
-
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
-        }
-
-        return $this->hasRole($permission->roles);
-    }
-
 
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
@@ -181,29 +161,6 @@ trait HasPermissions
     }
 
     /**
-     * Return all the permissions the model has via roles.
-     */
-    public function getAllPermissions(): Collection
-    {
-//        return $this->loadMissing('roles', 'roles.permissions')
-//            ->roles->flatMap(function ($role) {
-//                return $role->permissions;
-//            })->sort()->values();
-        return $this->permissions;
-    }
-
-    /**
-     * Return all the tree permissions the model has via roles.
-     */
-    public function getTreePermissions(): Collection
-    {
-        return $this->loadMissing('roles', 'roles.permissions')
-            ->roles->flatMap(function ($role) {
-                return $role->permissions;
-            })->sort()->values();
-    }
-
-    /**
      * Grant the given permission(s) to a role.
      *
      * @param string|array|Permission|\Illuminate\Support\Collection $permissions
@@ -229,10 +186,6 @@ trait HasPermissions
         $model = $this->getModel();
 
         if ($model->exists) {
-//            foreach ($this->roles as $role) {
-//                $role->permissions()->sync($permissions, false);
-//                $role->load('permissions');
-//            }
             $this->permissions()->sync($permissions, false);
             $model->load('permissions');
         } else {
@@ -274,23 +227,25 @@ trait HasPermissions
         return $this;
     }
 
-    public function getPermissionNames(): Collection
+    /**
+     * Return all the permissions the model has via roles.
+     */
+    public function getAllPermissions(): Collection
     {
-        return $this->permissions->pluck('name');
-    }
-
-    public function getPermissionDisplayName(): Collection
-    {
-        return $this->permissions->pluck('display_name');
-    }
-
-    public function getPermissionRouteMethod(): Collection
-    {
-        //todo
-        return $this->permissions->pluck('route', 'method');
+        return $this->permissions()->getResults();
     }
 
     /**
+     * Return all the tree permissions the model has via roles.
+     */
+    public function getTreePermissions(): Collection
+    {
+        return $this->permissions()->with('childrenPermissions')->where('pid', 0)->getResults();
+    }
+
+    /**
+     * Get Permission Model By Name,Id,RouteMethod
+     *
      * @param string|array|Permission|\Illuminate\Support\Collection $permissions
      *
      * @return Permission|Permission[]|\Illuminate\Support\Collection
@@ -318,6 +273,26 @@ trait HasPermissions
         }
 
         return $permissions;
+    }
+
+    /**
+     * Get All Permission Name
+     *
+     * @return Collection
+     */
+    public function getPermissionNames(): Collection
+    {
+        return $this->permissions->pluck('name');
+    }
+
+    /**
+     * Get All Permission Display Name
+     *
+     * @return Collection
+     */
+    public function getPermissionDisplayName(): Collection
+    {
+        return $this->permissions->pluck('display_name');
     }
 
     /**

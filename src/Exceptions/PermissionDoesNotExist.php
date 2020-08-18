@@ -8,7 +8,7 @@ class PermissionDoesNotExist extends InvalidArgumentException
 {
     public static function create(string $permissionName)
     {
-        return new static("There is no permission named `{$permissionName}`.");
+        return new static("There is no [permission] named `{$permissionName}`.");
     }
 
     public static function withId(int $permissionId)
@@ -16,8 +16,9 @@ class PermissionDoesNotExist extends InvalidArgumentException
         return new static("There is no [permission] with id `{$permissionId}`.");
     }
 
-    public static function withRouteAndMethod(string $route, string $method)
+    public static function withRouteAndMethod(array $permission)
     {
-        return new static("There is no [permission] with route `{$route}` and method `{$method}`.");
+        dump(1);
+        return new static("There is no [permission] with route `{$permission['route']}` and method `{$permission['method']}`.");
     }
 }

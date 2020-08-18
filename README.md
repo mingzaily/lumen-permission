@@ -38,6 +38,15 @@ You will also need the config/auth.php file. If you don't already have it, copy 
 ```shell script
 cp vendor/laravel/lumen-framework/config/auth.php config/auth.php
 ```
+
+#### 
+
+```php
+return $this->loadMissing('roles', 'roles.permissions')
+    ->roles->flatMap(function ($role) {
+        return $role->permissions;
+    })->sort()->values();
+```
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

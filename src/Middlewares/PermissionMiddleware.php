@@ -15,7 +15,7 @@ class PermissionMiddleware
 
         $permissions = is_array($permission)
             ? $permission
-            : explode('|', $permission);
+            : explode('|', (string)$permission);
 
         foreach ($permissions as $permission) {
             if (app('auth')->user()->can($permission)) {
@@ -23,6 +23,6 @@ class PermissionMiddleware
             }
         }
 
-        throw UnauthorizedException::forPermissions($permissions);
+        throw UnauthorizedException::forPermissions();
     }
 }

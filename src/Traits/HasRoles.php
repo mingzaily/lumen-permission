@@ -10,6 +10,12 @@ use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * Trait HasRoles
+ * @package Mingzaily\Permission\Traits
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
+ * @property-read int|null $roles_count
+ */
 trait HasRoles
 {
 //    use HasPermissions;
@@ -35,21 +41,21 @@ trait HasRoles
         return $this->roleClass;
     }
 
-//    /**
-//     * A model may have multiple roles.
-//     *
-//     * @return MorphToMany
-//     */
-//    public function roles(): MorphToMany
-//    {
-//        return $this->morphToMany(
-//            config('permission.models.role'),
-//            'model',
-//            config('permission.table_names.model_has_roles'),
-//            config('permission.column_names.model_morph_key'),
-//            'role_id'
-//        );
-//    }
+    /**
+     * A model may have multiple roles.
+     *
+     * @return MorphToMany
+     */
+    public function roles(): MorphToMany
+    {
+        return $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            'role_id'
+        );
+    }
 
     /**
      * Return a model have one of the role.
@@ -66,11 +72,11 @@ trait HasRoles
      * Return a model have all roles.
      * alias roles()
      *
-     * @return \Mingzaily\Permission\Models\Role
+     * @return Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[]
      */
-    public function getAllRole(): \Mingzaily\Permission\Models\Role
+    public function getAllRole()
     {
-        return $this->roles;
+        return $this->roles()->getResults();
     }
 
     /**
@@ -291,5 +297,13 @@ trait HasRoles
         }
 
         return $roles;
+    }
+
+    /**
+     * Forget the cached permissions.
+     */
+    public function forgetCachedPermissions()
+    {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }
