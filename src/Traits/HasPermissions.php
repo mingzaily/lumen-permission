@@ -198,15 +198,37 @@ trait HasPermissions
     /**
      * Return all the tree permissions the model has via roles.
      *
+     * @param null $pid
+     * @param null $allPermissions
+     *
      * @return Collection
      */
-    public function getTreePermissions(): Collection
+    public function getTreePermissions($pid = null, $allPermissions = null): Collection
     {
         //TODO 修复子节点未在权限仍然显示的bug
-        return $this->permissions()->with('childrenPermissions')
-            ->whereNull('pid')
-            ->orderBy('weight', 'desc')
-            ->getResults();
+//        return $this->permissions()->with('childrenPermissions')
+//            ->whereNull('pid')
+//            ->orderBy('weight', 'desc')
+//            ->getResults();
+        if (is_null($allPermissions)) {
+            // 从数据库中一次性取出所有类目
+            $allPermissions = $this->getAllPermissions();
+        }
+
+        return $allPermissions
+            // 从所有类目中挑选出父类目 ID 为 $parentId 的类目
+            ->where('pid', $pid)
+            // 遍历这些类目，并用返回值构建一个新的集合
+            ->map(function (Permission $permission) use ($allPermissions) {
+                $data = $permission;
+                // 如果当前类目不是父类目，则直接返回
+                if (!$permission->is_menu) {
+                    return $data;
+                }
+                // 否则递归调用本方法，将返回值放入 children 字段中
+                $data['children'] = $this->getTreePermissions($permission->id, $allPermissions);
+                return $data;
+            });
     }
 
     /**
