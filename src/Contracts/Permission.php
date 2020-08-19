@@ -3,13 +3,14 @@
 namespace Mingzaily\Permission\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 interface Permission
 {
     /**
      * A permission can be applied to roles.
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function roles(): BelongsToMany;
 
@@ -18,9 +19,9 @@ interface Permission
      *
      * @param string $name
      *
-     * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
+     * @return Permission
+     *@throws PermissionDoesNotExist
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
      */
     public static function findByName(string $name): self;
 
@@ -29,9 +30,9 @@ interface Permission
      *
      * @param int $id
      *
-     * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
+     * @return Permission
+     *@throws PermissionDoesNotExist
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
      */
     public static function findById(int $id): self;
 
@@ -40,9 +41,9 @@ interface Permission
      *
      * @param array $permission
      *
-     * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
+     * @return Permission
+     *@throws PermissionDoesNotExist
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
      */
     public static function findByRouteAndMethod(array $permission): self;
 
@@ -51,7 +52,7 @@ interface Permission
      *
      * @param array $attributes
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
+     * @return Permission
      */
     public static function findOrCreate(array $attributes): self;
 }

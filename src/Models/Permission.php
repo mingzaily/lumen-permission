@@ -2,12 +2,11 @@
 
 namespace Mingzaily\Permission\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Mingzaily\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
@@ -91,19 +90,21 @@ class Permission extends Model implements PermissionContract
     /**
      * Recursive hasMany Relationship with Unlimited Subcategories
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function children()
     {
-        return $this->hasMany(config('permission.models.permission'), 'pid', 'id')->orderBy('weight', 'desc');
+        return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function childrenPermissions()
     {
-        return $this->children()->with('childrenPermissions')->orderBy('weight', 'desc');
+        return $this->children()
+            ->with('childrenPermissions')
+            ->orderBy('weight', 'desc');
     }
 
     /**
@@ -111,9 +112,10 @@ class Permission extends Model implements PermissionContract
      *
      * @param string $name
      *
-     * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
+     * @return PermissionContract
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
+     * @throws PermissionDoesNotExist
+     *
      */
     public static function findByName(string $name): PermissionContract
     {
@@ -130,9 +132,9 @@ class Permission extends Model implements PermissionContract
      *
      * @param int $id
      *
-     * @throws \Mingzaily\Permission\Exceptions\PermissionDoesNotExist
+     * @return PermissionContract
+     *@throws PermissionDoesNotExist
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
      */
     public static function findById(int $id): PermissionContract
     {
@@ -148,7 +150,7 @@ class Permission extends Model implements PermissionContract
     /**
      * @param array $ability
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
+     * @return PermissionContract
      */
     public static function findByRouteAndMethod(array $ability): PermissionContract
     {
@@ -166,7 +168,7 @@ class Permission extends Model implements PermissionContract
      *
      * @param array $attributes
      *
-     * @return \Mingzaily\Permission\Contracts\Permission
+     * @return PermissionContract
      */
     public static function findOrCreate(array $attributes): PermissionContract
     {

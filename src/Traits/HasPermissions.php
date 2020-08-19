@@ -2,7 +2,9 @@
 
 namespace Mingzaily\Permission\Traits;
 
+use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\PermissionRegistrar;
@@ -76,7 +78,7 @@ trait HasPermissions
      * @param array ...$permissions
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function hasAnyPermission(...$permissions): bool
     {
@@ -97,7 +99,7 @@ trait HasPermissions
      * @param array ...$permissions
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function hasAllPermissions(...$permissions): bool
     {
@@ -131,6 +133,10 @@ trait HasPermissions
             })
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
+            })
+            ->map(function ($permission) {
+                //TODO：判断父节点是否已在范围之内
+                dd($permission->map->pid);
             })
             ->map->id
             ->all();
@@ -196,6 +202,7 @@ trait HasPermissions
      */
     public function getTreePermissions(): Collection
     {
+        //TODO 修复子节点未在权限仍然显示的bug
         return $this->permissions()->with('childrenPermissions')
             ->whereNull('pid')
             ->orderBy('weight', 'desc')
