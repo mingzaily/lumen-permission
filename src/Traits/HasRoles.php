@@ -2,8 +2,6 @@
 
 namespace Mingzaily\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;

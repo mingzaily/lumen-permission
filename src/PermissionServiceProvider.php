@@ -2,11 +2,8 @@
 
 namespace Mingzaily\Permission;
 
-use Illuminate\Routing\Route;
-use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Compilers\BladeCompiler;
 use Mingzaily\Permission\Contracts\Role as RoleContract;
 use Mingzaily\Permission\Contracts\Permission as PermissionContract;
 

@@ -18,7 +18,7 @@ class PermissionMiddleware
             : explode('|', (string)$permission);
 
         foreach ($permissions as $permission) {
-            if (app('auth')->user()->can($permission)) {
+            if (app('auth')->user()->can('hasPermission', $permission)) {
                 return $next($request);
             }
         }

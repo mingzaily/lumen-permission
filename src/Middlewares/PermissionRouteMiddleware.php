@@ -19,9 +19,9 @@ class PermissionRouteMiddleware
         if (app('auth')->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
-        
-        $ability = ['route' => $request->getPathInfo(), 'method' => strtolower($request->getMethod())];
-        if (app('auth')->user()->can('hasPermission', $ability)) {
+
+        $ability = [$request->path(), $request->method()];
+        if (app('auth')->user()->can('hasPermission', implode('|', $ability))) {
             return $next($request);
         }
 
