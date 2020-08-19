@@ -5,6 +5,7 @@ namespace Mingzaily\Permission\Models;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
+use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\Traits\HasPermissions;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
@@ -147,6 +148,10 @@ class Role extends Model implements RoleContract
 
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
+        }
+
+        if ($permission->is_menu) {
+            throw PermissionIsMenu::isMenu($permission->name);
         }
 
         return $this->permissions->contains('id', $permission->id);

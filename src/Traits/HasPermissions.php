@@ -4,7 +4,7 @@ namespace Mingzaily\Permission\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
+use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
@@ -12,7 +12,7 @@ use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 /**
  * Trait HasPermissions
  * @package Mingzaily\Permission\Traits
- * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Permission[] $permissions
+ * @property-read Collection|Permission[] $permissions
  * @property-read int|null $permissions_count
  */
 trait HasPermissions
@@ -53,56 +53,6 @@ trait HasPermissions
     }
 
     /**
-     * Scope the model query to certain permissions only.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopePermission(Builder $query, $permissions): Builder
-    {
-        $permissions = $this->convertToPermissionModels($permissions);
-
-        $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
-            return array_merge($result, $permission->roles->all());
-        }, []));
-
-        return $query->where(function (Builder $query) use ($permissions, $rolesWithPermissions) {
-            $query->whereHas('permissions', function (Builder $subQuery) use ($permissions) {
-                $subQuery->whereIn(config('permission.table_names.permissions').'.id', \array_column($permissions, 'id'));
-            });
-            if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function (Builder $subQuery) use ($rolesWithPermissions) {
-                    $subQuery->whereIn(config('permission.table_names.roles').'.id', \array_column($rolesWithPermissions, 'id'));
-                });
-            }
-        });
-    }
-
-    /**
-     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
-     *
-     * @return array
-     */
-    protected function convertToPermissionModels($permissions): array
-    {
-        if ($permissions instanceof Collection) {
-            $permissions = $permissions->all();
-        }
-
-        $permissions = is_array($permissions) ? $permissions : [$permissions];
-
-        return array_map(function ($permission) {
-            if ($permission instanceof Permission) {
-                return $permission;
-            }
-
-            return $this->getPermissionClass()->findByName($permission);
-        }, $permissions);
-    }
-
-    /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|array|int|Permission $permission
@@ -115,6 +65,8 @@ trait HasPermissions
             return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
             return false;
+        } catch (PermissionIsMenu $e) {
+            return true;
         }
     }
 
@@ -163,7 +115,7 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|Collection $permissions
      *
      * @return $this
      */
@@ -229,6 +181,8 @@ trait HasPermissions
 
     /**
      * Return all the permissions the model has via roles.
+     *
+     * @return Collection
      */
     public function getAllPermissions(): Collection
     {
@@ -237,18 +191,23 @@ trait HasPermissions
 
     /**
      * Return all the tree permissions the model has via roles.
+     *
+     * @return Collection
      */
     public function getTreePermissions(): Collection
     {
-        return $this->permissions()->with('childrenPermissions')->where('pid', 0)->getResults();
+        return $this->permissions()->with('childrenPermissions')
+            ->whereNull('pid')
+            ->orderBy('weight', 'desc')
+            ->getResults();
     }
 
     /**
      * Get Permission Model By Name,Id,RouteMethod
      *
-     * @param string|array|Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|Permission|Collection $permissions
      *
-     * @return Permission|Permission[]|\Illuminate\Support\Collection
+     * @return Permission|Permission[]|Collection
      */
     protected function getStoredPermission($permissions)
     {

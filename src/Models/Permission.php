@@ -23,7 +23,7 @@ use Mingzaily\Permission\Contracts\Permission as PermissionContract;
  * @property string $method
  * @property int $pid
  * @property int $weight
- * @property int $level
+ * @property int $is_menu
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
@@ -35,7 +35,7 @@ use Mingzaily\Permission\Contracts\Permission as PermissionContract;
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereIsMenu($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission wherePid($value)
@@ -95,7 +95,7 @@ class Permission extends Model implements PermissionContract
      */
     public function children()
     {
-        return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
+        return $this->hasMany(config('permission.models.permission'), 'pid', 'id')->orderBy('weight', 'desc');
     }
 
     /**
@@ -103,7 +103,7 @@ class Permission extends Model implements PermissionContract
      */
     public function childrenPermissions()
     {
-        return $this->children()->with('childrenPermissions');
+        return $this->children()->with('childrenPermissions')->orderBy('weight', 'desc');
     }
 
     /**

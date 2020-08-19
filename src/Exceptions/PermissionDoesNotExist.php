@@ -18,7 +18,11 @@ class PermissionDoesNotExist extends InvalidArgumentException
 
     public static function withRouteAndMethod(array $permission)
     {
-        dump(1);
         return new static("There is no [permission] with route `{$permission['route']}` and method `{$permission['method']}`.");
+    }
+
+    public static function isMenu(string $permissionName)
+    {
+        return new static("There is [menu] `{$permissionName}`, not a [permission].");
     }
 }

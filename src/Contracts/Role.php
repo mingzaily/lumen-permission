@@ -9,7 +9,7 @@ interface Role
     /**
      * A role may be given various permissions.
      *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function permissions(): BelongsToMany;
 
@@ -18,7 +18,7 @@ interface Role
      *
      * @param string $name
      *
-     * @return \Mingzaily\Permission\Contracts\Role
+     * @return Role
      *
      * @throws \Mingzaily\Permission\Exceptions\RoleDoesNotExist
      */
@@ -40,14 +40,14 @@ interface Role
      *
      * @param string $name
      *
-     * @return \Mingzaily\Permission\Contracts\Role
+     * @return Role
      */
     public static function findOrCreate(string $name): self;
 
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param string|\Mingzaily\Permission\Contracts\Permission $permission
+     * @param string|Permission $permission
      *
      * @return bool
      */

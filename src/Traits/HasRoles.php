@@ -3,20 +3,20 @@
 namespace Mingzaily\Permission\Traits;
 
 use Illuminate\Support\Collection;
-use Mingzaily\Permission\Contracts\Role;
+use Mingzaily\Permission\Models\Permission;
+use Mingzaily\Permission\Models\Role;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
+use Mingzaily\Permission\Exceptions\UnauthorizedException;
 use Mingzaily\Permission\PermissionRegistrar;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * Trait HasRoles
  * @package Mingzaily\Permission\Traits
- * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
+ * @property-read Collection|Role[] $roles
  * @property-read int|null $roles_count
  */
 trait HasRoles
 {
-//    use HasPermissions;
     private $roleClass;
 
     public static function bootHasRoles()
@@ -42,9 +42,9 @@ trait HasRoles
     /**
      * A model may have multiple roles.
      *
-     * @return MorphToMany
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function roles(): MorphToMany
+    public function roles(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
         return $this->morphToMany(
             config('permission.models.role'),
@@ -59,20 +59,23 @@ trait HasRoles
      * Return a model have one of the role.
      * alias roles()
      *
-     * @return \Mingzaily\Permission\Models\Role
+     * @return Role
      */
-    public function getFirstRole(): \Mingzaily\Permission\Models\Role
+    public function getFirstRole(): Role
     {
-        return $this->roles()->first();
+        if ($role = $this->getAllRoles()->first()) {
+            return $role;
+        }
+        throw UnauthorizedException::notAssignRole();
     }
 
     /**
      * Return a model have all roles.
      * alias roles()
      *
-     * @return Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[]
+     * @return Collection|Role[]
      */
-    public function getAllRole()
+    public function getAllRoles()
     {
         return $this->roles()->getResults();
     }
@@ -126,7 +129,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|Role $role
+     * @param string|int|Role $role
      *
      * @return $this
      */
@@ -144,12 +147,14 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|Role|string  ...$roles
+     * @param  array|string|Role ...$roles
      *
      * @return $this
      */
     public function syncRoles(...$roles)
     {
+        $this->checkMultipleRole($roles);
+
         $this->roles()->detach();
 
         return $this->assignRole($roles);
@@ -158,7 +163,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|Role|Collection $roles
+     * @param array|string|int|Role|Collection $roles
      *
      * @return bool
      */
@@ -169,15 +174,15 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
-            return $this->roles->contains('name', $roles);
+            return $this->getAllRoles()->contains('name', $roles);
         }
 
         if (is_int($roles)) {
-            return $this->roles->contains('id', $roles);
+            return $this->getAllRoles()->contains('id', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $this->getAllRoles()->contains('id', $roles->id);
         }
 
         if (is_array($roles)) {
@@ -190,7 +195,7 @@ trait HasRoles
             return false;
         }
 
-        return $roles->intersect($this->roles)->isNotEmpty();
+        return $roles->intersect($this->getAllRoles())->isNotEmpty();
     }
 
     /**
@@ -198,7 +203,7 @@ trait HasRoles
      *
      * Alias to hasRole()
      *
-     * @param string|int|array|Role|Collection $roles
+     * @param array|string|int|Role|\Illuminate\Database\Eloquent\Collection $roles
      *
      * @return bool
      */
@@ -210,7 +215,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|Role|Collection $roles
+     * @param  array|string|int|Role|Collection $roles
      * @return bool
      */
     public function hasAllRoles($roles): bool
@@ -220,23 +225,23 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
-            return $this->roles->contains('name', $roles);
+            return $this->getAllRoles()->contains('name', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            return $this->getAllRoles()->contains('id', $roles->id);
         }
 
         $roles = collect()->make($roles)->map(function ($role) {
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect($this->getRoleNames()) == $roles;
+        return $roles->intersect($this->getRoleNames()) === $roles;
     }
 
     public function getRoleNames(): Collection
     {
-        return $this->roles->pluck('name');
+        return $this->getAllRoles()->pluck('name');
     }
 
     protected function getStoredRole($role): Role
@@ -278,6 +283,7 @@ trait HasRoles
 
     /**
      * @param string|array|Role|Collection $roles
+     *
      * @return Collection
      */
     protected function checkMultipleRole($roles): Collection
@@ -289,18 +295,35 @@ trait HasRoles
             throw RoleAlreadyExists::assign();
         }
 
-        if ($this->roles->count() >= 1
+        if ($this->getAllRoles()->count() >= 1
             && !config('permission.model_has_multiple_roles')) {
-            throw RoleAlreadyExists::assignExits($this->roles[0]->name);
+            throw RoleAlreadyExists::assignExits($this->getFirstRole()->name);
         }
 
         return $roles;
     }
 
     /**
+     * Traverse all roles and view role permissions
+     * check permissions
+     *
+     * @param string|array|int|Permission $permission
+     *
+     * @return bool
+     */
+    public function checkPermission($permission)
+    {
+        return $this->roles()->getResults()->map(function ($role) use ($permission) {
+            return $role->checkPermissionTo($permission);
+        })->filter(function ($isOk) {
+            return $isOk;
+        })->isNotEmpty();
+    }
+
+    /**
      * Forget the cached permissions.
      */
-    public function forgetCachedPermissions()
+    protected function forgetCachedPermissions()
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

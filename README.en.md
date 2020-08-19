@@ -1,43 +1,38 @@
 # lumen-permission (RBAC Frame)
 [![Build Status](https://travis-ci.org/mingzaily/lumen-permission.svg?branch=master)](https://travis-ci.org/mingzaily/lumen-permission)[![GitHub license](https://img.shields.io/github/license/mingzaily/lumen-permission)](https://github.com/mingzaily/lumen-permission/blob/master/LICENSE)
 
-简体中文 | [English](./README.en.md) 
+[简体中文](./README.md)  | English
 
-## 开始
+## Start
 
-### 安装
+### Installation
 
-第一步，`composer`安装
-
+First, install from Composer
 ```shell script
 composer require mingzaily/lumen-permission
 ```
-
-安装成功后，复制以下文件
-
+Copy the files
 ```shell script
 cp vendor/mingzaily/lumen-permission/config/permission.php config/permission.php
 cp vendor/mingzaily/lumen-permission/database/migrations/create_permission_tables.php.stub database/migrations/2020_0 1_01_000000_create_permission_tables.php
 ```
-
-同时也需要把`lumen-framework`核心框架的`auth.php`配置文件复制出来
-
+You will also need the config/auth.php file. If you don't already have it, copy it from the vendor folder:
 ```shell script
 cp vendor/laravel/lumen-framework/config/auth.php config/auth.php
 ```
 
-然后在 `bootstrap/app.php`, 根据需要注册`PermissionMiddleware`，`PermissionRouteMiddleware`，`RoleMiddleware`（用法情况使用说明）
+Then, in `bootstrap/app.php`, uncomment the `auth` middleware, and register this package's middleware:
 
 ```php
 $app->routeMiddleware([
     'auth'       => App\Http\Middleware\Authenticate::class,
     'permission' => Mingzaily\Permission\Middlewares\PermissionMiddleware::class,
-    'permission_route' => Mingzaily\Permission\Middlewares\PermissionRouteMiddleware::class,
+    'auth-permission' => Mingzaily\Permission\Middlewares\PermissionMiddleware::class,
     'role'       => Mingzaily\Permission\Middlewares\RoleMiddleware::class,
 ]);
 ```
 
-在同个文件下,  注册扩展包的配置文件，`lumen-permission`的服务器提供类，和`cache`别名
+and in the same file, in the `ServiceProviders` section, register the package configuration, service provider, and cache alias:
 
 ```php
 // register permission config file
@@ -50,17 +45,17 @@ $app->register(Mingzaily\Permission\PermissionServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 ```
 
-接着，在`.env`或`config/database.php`配置数据库连接参数
+Ensure your database configuration is set in your `.env` (or `config/database.php` if you have one).
 
-运行迁移文件为扩展包创建表：
+Run the migrations to create the tables for this package:
 
 ```bash
 php artisan migrate
 ```
 
-### 使用
+### Use
 
-用户分配，删除，更换角色
+Model assign，remove，sync role.
 
 ```php
 $user = Auth::user();
@@ -74,13 +69,13 @@ $user->removeRole('test');
 $user->syncRole('test2');
 ```
 
-获取第一个角色
+Model get first role.
 
 ```php
 $role = $user->getFirstRole();
 ```
 
-获取所有角色
+Model get all roles.
 
 ```php
 $role = $user->roles;
@@ -88,7 +83,7 @@ $role = $user->roles;
 $role = $user->getAllRoles();
 ```
 
-判断是否有该角色
+Model determines whether there is a role.
 
 ```php
 $user->hasRole('test');
@@ -96,7 +91,7 @@ $user->hasAnyRole('test','test2');// Return true as long as one exists
 $user->hasAllRoles('test','test2');// All roles exist before returning true
 ```
 
-角色分配，删除权限
+Role give and revoke permissions.
 
 ```php
 $role->givePermissionTo('view.user');
@@ -106,15 +101,15 @@ $role->givePermissionTo(1);
 $role->revokePermissionTo('view.user');
 ```
 
-角色查看权限
+Role get permissions.
 
 ```php
 $role->getAllPermissions();
-// also support tree
+// tree struct
 $role->getTreePermissions();
 ```
 
-判断角色是否有该权限
+Role determines whether there is a permission.
 
 ```php
 $role->hasPermissionTo('view.user'); // $role->checkPermissionTo('view.user')
@@ -122,7 +117,7 @@ $role->hasAnyPermission('view.user','edit.user');
 $role->hasAllPermissions('view.user','edit.user')
 ```
 
-### 中间件
+### Middleware
 
 PermissionRouteMiddleware
 
@@ -148,23 +143,23 @@ Route::group(['middleware' => ['role:test']], function () {
 });
 ```
 
-## 感谢
+## Thank
 
-本扩展基于 [spatie/laravel-permission](https://github.com/spatie/laravel-permission) 进行更改
+Thank for and Change base on [spatie/laravel-permission](https://github.com/spatie/laravel-permission)
 
-### 不同点
+### Change
 
-- 支持配置一用户单角色或者一用户多角色
-- 修改`permission`表结构
-  - 添加`route`,`method`,`display_name`,`pid`,`is_menu`字段
-  - 删除 `guard_name`字段
-- 修改`role`表结构
-  - 添加 `display_name`字段
+- Support Configure One User One Role Or One User Multiple Roles
+- Change Permission Table
+  - Add filed `route`,`method`,`display_name`
   - Delete filed `guard_name`
-- 移出`model_has_permission`表格，移出`model`的直接权限
-- 移出Laravel blade模板支持（如需要，请使用 [spatie/laravel-permission](https://github.com/spatie/laravel-permission)）
-- 移出Guard看守器配置
-- 移出通配符权限设置
+- Change Role Table
+  - Add filed `display_name`
+  - Delete filed `guard_name`
+- Delete Model_Has_Permissions Table
+- Delete Laravel Blade Support
+- Delete Guard Config
+- Delete Wildcard Permission
 
 ## License
 
