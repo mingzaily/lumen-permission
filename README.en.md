@@ -1,5 +1,10 @@
 # lumen-permission (RBAC Frame)
-[![Build Status](https://travis-ci.org/mingzaily/lumen-permission.svg?branch=master)](https://travis-ci.org/mingzaily/lumen-permission)[![GitHub license](https://img.shields.io/github/license/mingzaily/lumen-permission)](https://github.com/mingzaily/lumen-permission/blob/master/LICENSE) ![StyleCI](https://github.styleci.io/repos/287014448/shield)
+![Travis (.org)](https://img.shields.io/travis/mingzaily/lumen-permission?style=flat-square)
+![StyleCI](https://github.styleci.io/repos/287014448/shield)
+![GitHub repo size](https://img.shields.io/github/repo-size/mingzaily/lumen-permission?style=flat-square)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/mingzaily/lumen-permission?style=flat-square)
+![Packagist Version](https://img.shields.io/packagist/v/mingzaily/lumen-permission?style=flat-square)
+![Packagist License](https://img.shields.io/packagist/l/mingzaily/lumen-permission?style=flat-square)
 
 [简体中文](./README.md)  | English
 

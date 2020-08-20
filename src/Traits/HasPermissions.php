@@ -123,7 +123,6 @@ trait HasPermissions
      * Grant the given permission(s) to a role.
      *
      * @param string|array|Permission|Collection $permissions
-     *
      * @return $this
      */
     public function givePermissionTo(...$permissions)
@@ -155,7 +154,6 @@ trait HasPermissions
      * Revoke the given permission.
      *
      * @param Permission|Permission[]|string|string[] $permission
-     *
      * @return $this
      */
     public function revokePermissionTo($permission)
@@ -173,7 +171,6 @@ trait HasPermissions
      * Remove all current permissions and set the given ones.
      *
      * @param string|array|Permission|Collection $permissions
-     *
      * @return $this
      */
     public function syncPermissions(...$permissions)
@@ -208,6 +205,7 @@ trait HasPermissions
             ->where('pid', $pid)
             ->map(function (Permission $permission) use ($allPermissions) {
                 $data = $permission;
+
                 if (! $permission->is_menu) {
                     return $data;
                 }

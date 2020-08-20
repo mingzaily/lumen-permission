@@ -137,7 +137,6 @@ trait HasRoles
      * Remove all current roles and set the given ones.
      *
      * @param array|string|Role ...$roles
-     *
      * @return $this
      */
     public function syncRoles(...$roles)
@@ -188,8 +187,7 @@ trait HasRoles
 
     /**
      * Determine if the model has any of the given role(s).
-     *
-     * Alias to hasRole()
+     * alias to hasRole()
      *
      * @param array|string|int|Role|\Illuminate\Database\Eloquent\Collection $roles
      * @return bool
