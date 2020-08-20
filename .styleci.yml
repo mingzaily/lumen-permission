@@ -3,6 +3,7 @@ preset: laravel
 enabled:
 - length_ordered_imports
 - long_list_syntax
+- phpdoc_add_missing_param_annotation
 
 disabled:
 - short_list_syntax
