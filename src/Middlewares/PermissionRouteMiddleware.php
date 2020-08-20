@@ -17,11 +17,6 @@ use Mingzaily\Permission\Exceptions\UnauthorizedException;
 
 class PermissionRouteMiddleware
 {
-    /**
-     * @param Request $request
-     *
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
         if (app('auth')->guest()) {

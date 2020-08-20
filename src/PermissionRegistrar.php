@@ -13,6 +13,7 @@ namespace Mingzaily\Permission;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Cache\Repository;
 use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Mingzaily\Permission\Contracts\Permission;
@@ -20,10 +21,10 @@ use Illuminate\Contracts\Auth\Access\Authorizable;
 
 class PermissionRegistrar
 {
-    /** @var \Illuminate\Contracts\Cache\Repository */
+    /** @var Repository */
     protected $cache;
 
-    /** @var \Illuminate\Cache\CacheManager */
+    /** @var CacheManager */
     protected $cacheManager;
 
     /** @var string */
@@ -32,7 +33,7 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
-    /** @var \Illuminate\Support\Collection */
+    /** @var Collection */
     protected $permissions;
 
     /** @var \DateInterval|int */
@@ -46,6 +47,8 @@ class PermissionRegistrar
 
     /**
      * PermissionRegistrar constructor.
+     *
+     * @param CacheManager $cacheManager
      */
     public function __construct(CacheManager $cacheManager)
     {
@@ -66,7 +69,7 @@ class PermissionRegistrar
         $this->cache = $this->getCacheStoreFromConfig();
     }
 
-    protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
+    protected function getCacheStoreFromConfig(): Repository
     {
         // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
         $cacheDriver = config('permission.cache.store', 'default');
@@ -125,6 +128,9 @@ class PermissionRegistrar
 
     /**
      * Get the permissions based on the passed params.
+     *
+     * @param array $params
+     * @return Collection
      */
     public function getPermissions(array $params = []): Collection
     {
