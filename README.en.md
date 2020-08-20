@@ -65,7 +65,7 @@ $user->assignRole('test');
 $user->assignRole('test1','test2');
 // remove role
 $user->removeRole('test');
-// sync role => remove all assigned role,and assign give role
+// sync role => remove all current roles and set the given ones.
 $user->syncRole('test2');
 ```
 
@@ -99,6 +99,8 @@ $role->givePermissionTo('view.user');
 $role->givePermissionTo(1);
 // revoke
 $role->revokePermissionTo('view.user');
+// sync => remove all current permissions and set the given ones.
+$role->syncPermissionTo(1,2,3)
 ```
 
 Role get permissions.

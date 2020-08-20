@@ -102,24 +102,8 @@ trait HasRoles
             ->map->id
             ->all();
 
-        $model = $this->getModel();
-
-        if ($model->exists) {
-            $this->roles()->sync($roles, false);
-            $model->load('roles');
-        } else {
-            $class = \get_class($model);
-            $class::saved(
-                function ($object) use ($roles, $model) {
-                    static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
-                        return;
-                    }
-                    $object->roles()->sync($roles, false);
-                    $object->load('roles');
-                    $modelLastFiredOn = $object;
-                });
-        }
+        $this->roles()->sync($roles, false);
+        $this->load('roles');
 
         $this->forgetCachedPermissions();
 
@@ -153,7 +137,7 @@ trait HasRoles
      */
     public function syncRoles(...$roles)
     {
-        $this->checkMultipleRole($roles);
+        $roles = $this->checkMultipleRole($roles, false);
 
         $this->roles()->detach();
 
@@ -283,10 +267,11 @@ trait HasRoles
 
     /**
      * @param string|array|Role|Collection $roles
+     * @param bool $given
      *
      * @return Collection
      */
-    protected function checkMultipleRole($roles): Collection
+    protected function checkMultipleRole($roles, bool $given = true): Collection
     {
         $roles = collect($roles)->flatten();
 
@@ -296,6 +281,8 @@ trait HasRoles
         }
 
         if ($this->getAllRoles()->count() >= 1
+            && $given
+            && !in_array($this->getFirstRole()->name, $roles->toArray())
             && !config('permission.model_has_multiple_roles')) {
             throw RoleAlreadyExists::assignExits($this->getFirstRole()->name);
         }

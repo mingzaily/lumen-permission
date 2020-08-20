@@ -134,33 +134,11 @@ trait HasPermissions
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
             })
-            ->map(function ($permission) {
-                //TODO：判断父节点是否已在范围之内
-                dd($permission->map->pid);
-            })
             ->map->id
             ->all();
 
-        $model = $this->getModel();
-
-        if ($model->exists) {
-            $this->permissions()->sync($permissions, false);
-            $model->load('permissions');
-        } else {
-            $class = \get_class($model);
-
-            $class::saved(
-                function ($object) use ($permissions, $model) {
-                    static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
-                        return;
-                    }
-                    $object->permissions()->sync($permissions, false);
-                    $object->load('permissions');
-                    $modelLastFiredOn = $object;
-                }
-            );
-        }
+        $this->permissions()->sync($permissions, false);
+        $this->load('permissions');
 
         $this->forgetCachedPermissions();
 
@@ -186,6 +164,20 @@ trait HasPermissions
     }
 
     /**
+     * Remove all current permissions and set the given ones.
+     *
+     * @param string|array|Permission|Collection $permissions
+     *
+     * @return $this
+     */
+    public function syncPermissions(...$permissions)
+    {
+        $this->permissions()->detach();
+
+        return $this->givePermissionTo($permissions);
+    }
+
+    /**
      * Return all the permissions the model has via roles.
      *
      * @return Collection
@@ -205,28 +197,17 @@ trait HasPermissions
      */
     public function getTreePermissions($pid = null, $allPermissions = null): Collection
     {
-        //TODO 修复子节点未在权限仍然显示的bug
-//        return $this->permissions()->with('childrenPermissions')
-//            ->whereNull('pid')
-//            ->orderBy('weight', 'desc')
-//            ->getResults();
         if (is_null($allPermissions)) {
-            // 从数据库中一次性取出所有类目
             $allPermissions = $this->getAllPermissions();
         }
-
         return $allPermissions
-            // 从所有类目中挑选出父类目 ID 为 $parentId 的类目
             ->where('pid', $pid)
-            // 遍历这些类目，并用返回值构建一个新的集合
             ->map(function (Permission $permission) use ($allPermissions) {
                 $data = $permission;
-                // 如果当前类目不是父类目，则直接返回
                 if (!$permission->is_menu) {
                     return $data;
                 }
-                // 否则递归调用本方法，将返回值放入 children 字段中
-                $data['children'] = $this->getTreePermissions($permission->id, $allPermissions);
+                $data['children'] = $this->getTreePermissions($permission->id, $allPermissions)->values();
                 return $data;
             });
     }

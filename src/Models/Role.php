@@ -23,15 +23,15 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
  * @property-read int|null $users_count
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role permission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role query()
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereDisplayName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Role whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role permission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereDisplayName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Role extends Model implements RoleContract
@@ -78,9 +78,9 @@ class Role extends Model implements RoleContract
      *
      * @param string $name
      *
-     * @return \Mingzaily\Permission\Contracts\Role|\Mingzaily\Permission\Models\Role
+     * @return RoleContract|Role
      *
-     * @throws \Mingzaily\Permission\Exceptions\RoleDoesNotExist
+     * @throws RoleDoesNotExist
      */
     public static function findByName(string $name): RoleContract
     {
@@ -110,7 +110,7 @@ class Role extends Model implements RoleContract
      *
      * @param string $name
      *
-     * @return \Mingzaily\Permission\Contracts\Role
+     * @return RoleContract
      */
     public static function findOrCreate(string $name): RoleContract
     {

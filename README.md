@@ -70,7 +70,7 @@ $user->assignRole('test');
 $user->assignRole('test1','test2');
 // remove role
 $user->removeRole('test');
-// sync role => remove all assigned role,and assign give role
+// sync role => Remove all current roles and set the given ones.
 $user->syncRole('test2');
 ```
 
@@ -96,7 +96,7 @@ $user->hasAnyRole('test','test2');// Return true as long as one exists
 $user->hasAllRoles('test','test2');// All roles exist before returning true
 ```
 
-角色分配，删除权限
+角色分配，删除，同步权限
 
 ```php
 $role->givePermissionTo('view.user');
@@ -104,6 +104,8 @@ $role->givePermissionTo('view.user');
 $role->givePermissionTo(1);
 // revoke
 $role->revokePermissionTo('view.user');
+// sync => remove all current permissions and set the given ones.
+$role->syncPermissionTo(1,2,3)
 ```
 
 角色查看权限
@@ -120,6 +122,12 @@ $role->getTreePermissions();
 $role->hasPermissionTo('view.user'); // $role->checkPermissionTo('view.user')
 $role->hasAnyPermission('view.user','edit.user');
 $role->hasAllPermissions('view.user','edit.user')
+```
+
+也可以通过懒加载进行获取角色及相关权限
+
+```php
+$user->load('roles.permissions')
 ```
 
 ### 中间件
