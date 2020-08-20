@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,15 +23,16 @@ use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
- * Mingzaily\Permission\Models\Role
+ * Mingzaily\Permission\Models\Role.
  *
- * @property int $id
- * @property string $name
- * @property string $display_name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
- * @property-read int|null $users_count
+ * @property int                                                         $id
+ * @property string                                                      $name
+ * @property string                                                      $display_name
+ * @property \Illuminate\Support\Carbon|null                             $created_at
+ * @property \Illuminate\Support\Carbon|null                             $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @property int|null                                                    $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Role permission($permissions)
@@ -65,7 +75,7 @@ class Role extends Model implements RoleContract
     public function users(): MorphToMany
     {
         return $this->morphedByMany(
-            config("auth.providers.users.model"),
+            config('auth.providers.users.model'),
             'model',
             config('permission.table_names.model_has_roles'),
             'role_id',
@@ -76,18 +86,15 @@ class Role extends Model implements RoleContract
     /**
      * Find a role by its name and guard name.
      *
-     * @param string $name
-     *
      * @return RoleContract|Role
      *
      * @throws RoleDoesNotExist
      */
     public static function findByName(string $name): RoleContract
     {
-
         $role = static::where('name', $name)->first();
 
-        if (! $role) {
+        if (!$role) {
             throw RoleDoesNotExist::named($name);
         }
 
@@ -98,7 +105,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('id', $id)->first();
 
-        if (! $role) {
+        if (!$role) {
             throw RoleDoesNotExist::withId($id);
         }
 
@@ -107,16 +114,12 @@ class Role extends Model implements RoleContract
 
     /**
      * Find or create role by its name.
-     *
-     * @param string $name
-     *
-     * @return RoleContract
      */
     public static function findOrCreate(string $name): RoleContract
     {
         $role = static::where('name', $name)->first();
 
-        if (! $role) {
+        if (!$role) {
             return static::query()->create(['name' => $name]);
         }
 
@@ -127,8 +130,6 @@ class Role extends Model implements RoleContract
      * Determine if the user may perform the given permission.
      *
      * @param string|int|Permission|array $permission
-     *
-     * @return bool
      */
     public function hasPermissionTo($permission): bool
     {
@@ -146,8 +147,8 @@ class Role extends Model implements RoleContract
             $permission = $permissionClass->findByRouteAndMethod($permission);
         }
 
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
+        if (!$permission instanceof Permission) {
+            throw new PermissionDoesNotExist();
         }
 
         if ($permission->is_menu) {

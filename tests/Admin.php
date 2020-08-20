@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Spatie\Permission\Test;
 
 use Illuminate\Auth\Authenticatable;
@@ -11,7 +20,9 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Admin extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use HasRoles, Authorizable, Authenticatable;
+    use Authenticatable;
+    use Authorizable;
+    use HasRoles;
 
     protected $fillable = ['email'];
 

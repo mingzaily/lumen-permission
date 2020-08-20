@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission;
 
 use Illuminate\Cache\CacheManager;
@@ -37,8 +46,6 @@ class PermissionRegistrar
 
     /**
      * PermissionRegistrar constructor.
-     *
-     * @param \Illuminate\Cache\CacheManager $cacheManager
      */
     public function __construct(CacheManager $cacheManager)
     {
@@ -65,12 +72,12 @@ class PermissionRegistrar
         $cacheDriver = config('permission.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
-        if ($cacheDriver === 'default') {
+        if ('default' === $cacheDriver) {
             return $this->cacheManager->store();
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
-        if (! \array_key_exists($cacheDriver, config('cache.stores'))) {
+        if (!\array_key_exists($cacheDriver, config('cache.stores'))) {
             $cacheDriver = 'array';
         }
 
@@ -80,17 +87,16 @@ class PermissionRegistrar
     /**
      * Register the permission check method on the gate.
      * We resolve the Gate fresh here, for benefit of long-running instances.
-     *
-     * @return bool
      */
     public function registerPermissions(): bool
     {
         app(Gate::class)->define('hasPermission', function (Authorizable $user, string $ability) {
-            $ability = strpos($ability, '|') === false ?
+            $ability = false === strpos($ability, '|') ?
                 $ability : ['route' => explode('|', $ability)[0], 'method' => explode('|', $ability)[1]];
             if (method_exists($user, 'checkPermission')) {
-                return $user->checkPermission($ability) ? : null;
+                return $user->checkPermission($ability) ?: null;
             }
+
             return null;
         });
 
@@ -119,14 +125,10 @@ class PermissionRegistrar
 
     /**
      * Get the permissions based on the passed params.
-     *
-     * @param array $params
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function getPermissions(array $params = []): Collection
     {
-        if ($this->permissions === null) {
+        if (null === $this->permissions) {
             $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
                 return $this->getPermissionClass()
                     ->with('roles')
@@ -145,8 +147,6 @@ class PermissionRegistrar
 
     /**
      * Get an instance of the permission class.
-     *
-     * @return \Mingzaily\Permission\Contracts\Permission
      */
     public function getPermissionClass(): Permission
     {
@@ -162,8 +162,6 @@ class PermissionRegistrar
 
     /**
      * Get an instance of the role class.
-     *
-     * @return \Mingzaily\Permission\Contracts\Role
      */
     public function getRoleClass(): Role
     {
@@ -172,8 +170,6 @@ class PermissionRegistrar
 
     /**
      * Get the instance of the Cache Store.
-     *
-     * @return \Illuminate\Contracts\Cache\Store
      */
     public function getCacheStore(): \Illuminate\Contracts\Cache\Store
     {

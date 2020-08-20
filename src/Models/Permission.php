@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,20 +22,21 @@ use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
 use Mingzaily\Permission\Contracts\Permission as PermissionContract;
 
 /**
- * Mingzaily\Permission\Models\Permission
+ * Mingzaily\Permission\Models\Permission.
  *
- * @property int $id
- * @property string $name
- * @property string $display_name
- * @property string $route
- * @property string $method
- * @property int $pid
- * @property int $weight
- * @property int $is_menu
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
- * @property-read int|null $roles_count
+ * @property int                                                                          $id
+ * @property string                                                                       $name
+ * @property string                                                                       $display_name
+ * @property string                                                                       $route
+ * @property string                                                                       $method
+ * @property int                                                                          $pid
+ * @property int                                                                          $weight
+ * @property int                                                                          $is_menu
+ * @property \Illuminate\Support\Carbon|null                                              $created_at
+ * @property \Illuminate\Support\Carbon|null                                              $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection|\Mingzaily\Permission\Models\Role[] $roles
+ * @property int|null                                                                     $roles_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\Mingzaily\Permission\Models\Permission permission($permissions)
@@ -88,7 +98,7 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * Recursive hasMany Relationship with Unlimited Subcategories
+     * Recursive hasMany Relationship with Unlimited Subcategories.
      *
      * @return HasMany
      */
@@ -110,17 +120,12 @@ class Permission extends Model implements PermissionContract
     /**
      * Find a permission by its name (and optionally guardName).
      *
-     * @param string $name
-     *
-     * @return PermissionContract
-     *
      * @throws PermissionDoesNotExist
-     *
      */
     public static function findByName(string $name): PermissionContract
     {
         $permission = static::getPermissions(['name' => $name])->first();
-        if (! $permission) {
+        if (!$permission) {
             throw PermissionDoesNotExist::create($name);
         }
 
@@ -130,33 +135,24 @@ class Permission extends Model implements PermissionContract
     /**
      * Find a permission by its id (and optionally guardName).
      *
-     * @param int $id
-     *
-     * @return PermissionContract
      *@throws PermissionDoesNotExist
-     *
      */
     public static function findById(int $id): PermissionContract
     {
         $permission = static::getPermissions(['id' => $id])->first();
 
-        if (! $permission) {
+        if (!$permission) {
             throw PermissionDoesNotExist::withId($id);
         }
 
         return $permission;
     }
 
-    /**
-     * @param array $ability
-     *
-     * @return PermissionContract
-     */
     public static function findByRouteAndMethod(array $ability): PermissionContract
     {
         $permission = static::getPermissions($ability)->first();
 
-        if (! $permission) {
+        if (!$permission) {
             throw PermissionDoesNotExist::withRouteAndMethod($ability);
         }
 
@@ -165,10 +161,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Find or create permission by its name (and optionally guardName).
-     *
-     * @param array $attributes
-     *
-     * @return PermissionContract
      */
     public static function findOrCreate(array $attributes): PermissionContract
     {
@@ -179,7 +171,7 @@ class Permission extends Model implements PermissionContract
             'method' => $attributes['method'],
         ])->first();
 
-        if (! $permission) {
+        if (!$permission) {
             return static::query()->create([
                 'name' => $attributes['name'],
                 'display_name' => $attributes['display_name'],
@@ -193,10 +185,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached permissions.
-     *
-     * @param array $params
-     *
-     * @return Collection
      */
     protected static function getPermissions(array $params = []): Collection
     {
