@@ -187,7 +187,7 @@ trait HasRoles
 
     /**
      * Determine if the model has any of the given role(s).
-     * alias to hasRole()
+     * alias to hasRole().
      *
      * @param array|string|int|Role|\Illuminate\Database\Eloquent\Collection $roles
      * @return bool
