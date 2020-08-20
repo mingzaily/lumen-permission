@@ -150,6 +150,31 @@ Route::group(['middleware' => ['role:test']], function () {
 });
 ```
 
+### Super Admin
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    ......
+
+    public function register()
+    {
+        // super-admin no need to verify permissions
+        Gate::before(function ($user, string $ability) {
+            return $user->hasRole('super-admin') ? true : null;
+        });
+    }
+
+    ......
+}
+```
+
 ## Thank
 
 Thank for and Change base on [spatie/laravel-permission](https://github.com/spatie/laravel-permission)

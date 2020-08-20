@@ -23,7 +23,7 @@ class PermissionRouteMiddleware
         }
 
         $ability = $request->getPathInfo().'|'.$request->getMethod();
-        if (app('auth')->user()->can('hasPermission', $ability)) {
+        if (app('auth')->user()->can($ability)) {
             return $next($request);
         }
 

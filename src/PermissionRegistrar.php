@@ -93,7 +93,7 @@ class PermissionRegistrar
      */
     public function registerPermissions(): bool
     {
-        app(Gate::class)->define('hasPermission', function (Authorizable $user, string $ability) {
+        app(Gate::class)->before(function (Authorizable $user, string $ability) {
             $ability = false === strpos($ability, '|') ?
                 $ability : ['route' => explode('|', $ability)[0], 'method' => explode('|', $ability)[1]];
             if (method_exists($user, 'checkPermission')) {

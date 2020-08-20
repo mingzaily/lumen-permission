@@ -132,7 +132,7 @@ $role->hasAllPermissions('view.user','edit.user')
 也可以通过懒加载进行获取角色及相关权限
 
 ```php
-$user->load('roles.permissions')
+$user->load('roles.permissions');
 ```
 
 ### 中间件
@@ -159,6 +159,31 @@ RoleMiddleware
 Route::group(['middleware' => ['role:test']], function () {
     //
 });
+```
+
+### 超级管理员设置
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    ......
+
+    public function register()
+    {
+        // super-admin no need to verify permissions
+        Gate::before(function ($user, string $ability) {
+            return $user->hasRole('super-admin') ? true : null;
+        });
+    }
+
+    ......
+}
 ```
 
 ## 感谢
