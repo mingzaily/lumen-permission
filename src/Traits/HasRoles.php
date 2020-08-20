@@ -12,11 +12,11 @@
 namespace Mingzaily\Permission\Traits;
 
 use Illuminate\Support\Collection;
-use Mingzaily\Permission\Models\Permission;
 use Mingzaily\Permission\Models\Role;
+use Mingzaily\Permission\Models\Permission;
+use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Exceptions\UnauthorizedException;
-use Mingzaily\Permission\PermissionRegistrar;
 
 /**
  * Trait HasRoles.
@@ -31,7 +31,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -41,7 +41,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if (!isset($this->roleClass)) {
+        if (! isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
@@ -261,7 +261,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (!in_array($quoteCharacter, ["'", '"'])) {
+        if (! in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 
@@ -278,14 +278,14 @@ trait HasRoles
         $roles = collect($roles)->flatten();
 
         if ($roles->count() > 1
-            && !config('permission.model_has_multiple_roles')) {
+            && ! config('permission.model_has_multiple_roles')) {
             throw RoleAlreadyExists::assign();
         }
 
         if ($this->getAllRoles()->count() >= 1
             && $given
-            && !in_array($this->getFirstRole()->name, $roles->toArray())
-            && !config('permission.model_has_multiple_roles')) {
+            && ! in_array($this->getFirstRole()->name, $roles->toArray())
+            && ! config('permission.model_has_multiple_roles')) {
             throw RoleAlreadyExists::assignExits($this->getFirstRole()->name);
         }
 

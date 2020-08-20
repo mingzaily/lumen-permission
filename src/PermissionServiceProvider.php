@@ -53,7 +53,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         $config = $this->app->config['permission.models'];
 
-        if (!$config) {
+        if (! $config) {
             return;
         }
 
@@ -63,12 +63,12 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerMacroHelpers()
     {
-        if (!method_exists(Route::class, 'macro')) { // Lumen
+        if (! method_exists(Route::class, 'macro')) { // Lumen
             return;
         }
 
         Route::macro('role', function ($roles = []) {
-            if (!is_array($roles)) {
+            if (! is_array($roles)) {
                 $roles = [$roles];
             }
 
@@ -80,7 +80,7 @@ class PermissionServiceProvider extends ServiceProvider
         });
 
         Route::macro('permission', function ($permissions = []) {
-            if (!is_array($permissions)) {
+            if (! is_array($permissions)) {
                 $permissions = [$permissions];
             }
 
