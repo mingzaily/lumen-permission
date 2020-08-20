@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,15 +18,11 @@ interface Role
 {
     /**
      * A role may be given various permissions.
-     *
-     * @return BelongsToMany
      */
     public function permissions(): BelongsToMany;
 
     /**
      * Find a role by its name and guard name.
-     *
-     * @param string $name
      *
      * @return Role
      *
@@ -28,8 +33,6 @@ interface Role
     /**
      * Find a role by its id and guard name.
      *
-     * @param int $id
-     *
      * @return Role
      *
      * @throws RoleDoesNotExist
@@ -39,8 +42,6 @@ interface Role
     /**
      * Find or create a role by its name and guard name.
      *
-     * @param string $name
-     *
      * @return Role
      */
     public static function findOrCreate(string $name): self;
@@ -49,8 +50,6 @@ interface Role
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
-     *
-     * @return bool
      */
     public function hasPermissionTo($permission): bool;
 }
