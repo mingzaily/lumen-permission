@@ -12,8 +12,8 @@
 namespace Mingzaily\Permission\Test;
 
 use Illuminate\Support\Facades\Cache;
-use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Schema;
+use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
