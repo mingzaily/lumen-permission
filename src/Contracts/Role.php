@@ -11,8 +11,8 @@
 
 namespace Mingzaily\Permission\Contracts;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 interface Role
 {
@@ -24,18 +24,16 @@ interface Role
     /**
      * Find a role by its name and guard name.
      *
-     * @return Role
-     *
      * @throws RoleDoesNotExist
+     * @return Role
      */
     public static function findByName(string $name): self;
 
     /**
      * Find a role by its id and guard name.
      *
-     * @return Role
-     *
      * @throws RoleDoesNotExist
+     * @return Role
      */
     public static function findById(int $id): self;
 
