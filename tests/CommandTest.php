@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Spatie\Permission\Test;
 
 use Spatie\Permission\Models\Role;
@@ -91,8 +100,8 @@ class CommandTest extends TestCase
 
         $output = Artisan::output();
 
-        $this->assertTrue(strpos($output, 'Guard: web') !== false);
-        $this->assertTrue(strpos($output, 'Guard: admin') !== false);
+        $this->assertTrue(false !== strpos($output, 'Guard: web'));
+        $this->assertTrue(false !== strpos($output, 'Guard: admin'));
 
         // |               | testRole | testRole2 |
         $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
@@ -118,7 +127,7 @@ class CommandTest extends TestCase
 
         $output = Artisan::output();
 
-        $this->assertTrue(strpos($output, 'Guard: web') !== false);
-        $this->assertTrue(strpos($output, 'Guard: admin') === false);
+        $this->assertTrue(false !== strpos($output, 'Guard: web'));
+        $this->assertTrue(false === strpos($output, 'Guard: admin'));
     }
 }

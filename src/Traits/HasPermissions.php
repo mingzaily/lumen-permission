@@ -1,10 +1,18 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission\Traits;
 
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\PermissionRegistrar;
@@ -12,10 +20,10 @@ use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 /**
- * Trait HasPermissions
- * @package Mingzaily\Permission\Traits
- * @property-read Collection|Permission[] $permissions
- * @property-read int|null $permissions_count
+ * Trait HasPermissions.
+ *
+ * @property Collection|Permission[] $permissions
+ * @property int|null                $permissions_count
  */
 trait HasPermissions
 {
@@ -24,7 +32,7 @@ trait HasPermissions
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
@@ -34,7 +42,7 @@ trait HasPermissions
 
     public function getPermissionClass()
     {
-        if (! isset($this->permissionClass)) {
+        if (!isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 
@@ -58,8 +66,6 @@ trait HasPermissions
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|array|int|Permission $permission
-     *
-     * @return bool
      */
     public function checkPermissionTo($permission): bool
     {
@@ -77,7 +83,6 @@ trait HasPermissions
      *
      * @param array ...$permissions
      *
-     * @return bool
      * @throws Exception
      */
     public function hasAnyPermission(...$permissions): bool
@@ -98,7 +103,6 @@ trait HasPermissions
      *
      * @param array ...$permissions
      *
-     * @return bool
      * @throws Exception
      */
     public function hasAllPermissions(...$permissions): bool
@@ -106,7 +110,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission)) {
+            if (!$this->hasPermissionTo($permission)) {
                 return false;
             }
         }
@@ -129,6 +133,7 @@ trait HasPermissions
                 if (empty($permission)) {
                     return false;
                 }
+
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
@@ -152,7 +157,7 @@ trait HasPermissions
             $class::saved(
                 function ($object) use ($permissions, $model) {
                     static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
+                    if (null !== $modelLastFiredOn && $modelLastFiredOn === $model) {
                         return;
                     }
                     $object->permissions()->sync($permissions, false);
@@ -187,8 +192,6 @@ trait HasPermissions
 
     /**
      * Return all the permissions the model has via roles.
-     *
-     * @return Collection
      */
     public function getAllPermissions(): Collection
     {
@@ -200,8 +203,6 @@ trait HasPermissions
      *
      * @param null $pid
      * @param null $allPermissions
-     *
-     * @return Collection
      */
     public function getTreePermissions($pid = null, $allPermissions = null): Collection
     {
@@ -227,12 +228,13 @@ trait HasPermissions
                 }
                 // 否则递归调用本方法，将返回值放入 children 字段中
                 $data['children'] = $this->getTreePermissions($permission->id, $allPermissions);
+
                 return $data;
             });
     }
 
     /**
-     * Get Permission Model By Name,Id,RouteMethod
+     * Get Permission Model By Name,Id,RouteMethod.
      *
      * @param string|array|Permission|Collection $permissions
      *
@@ -264,9 +266,7 @@ trait HasPermissions
     }
 
     /**
-     * Get All Permission Name
-     *
-     * @return Collection
+     * Get All Permission Name.
      */
     public function getPermissionNames(): Collection
     {
@@ -274,9 +274,7 @@ trait HasPermissions
     }
 
     /**
-     * Get All Permission Display Name
-     *
-     * @return Collection
+     * Get All Permission Display Name.
      */
     public function getPermissionDisplayName(): Collection
     {

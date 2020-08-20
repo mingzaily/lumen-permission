@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the mingzaily/lumen-permission.
+ *
+ * (c) mingzaily <mingzaily@163.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Mingzaily\Permission\Traits;
 
 use Illuminate\Support\Collection;
@@ -10,10 +19,10 @@ use Mingzaily\Permission\Exceptions\UnauthorizedException;
 use Mingzaily\Permission\PermissionRegistrar;
 
 /**
- * Trait HasRoles
- * @package Mingzaily\Permission\Traits
- * @property-read Collection|Role[] $roles
- * @property-read int|null $roles_count
+ * Trait HasRoles.
+ *
+ * @property Collection|Role[] $roles
+ * @property int|null          $roles_count
  */
 trait HasRoles
 {
@@ -22,7 +31,7 @@ trait HasRoles
     public static function bootHasRoles()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
                 return;
             }
 
@@ -32,7 +41,7 @@ trait HasRoles
 
     public function getRoleClass()
     {
-        if (! isset($this->roleClass)) {
+        if (!isset($this->roleClass)) {
             $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
         }
 
@@ -41,8 +50,6 @@ trait HasRoles
 
     /**
      * A model may have multiple roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function roles(): \Illuminate\Database\Eloquent\Relations\MorphToMany
     {
@@ -57,9 +64,7 @@ trait HasRoles
 
     /**
      * Return a model have one of the role.
-     * alias roles()
-     *
-     * @return Role
+     * alias roles().
      */
     public function getFirstRole(): Role
     {
@@ -71,7 +76,7 @@ trait HasRoles
 
     /**
      * Return a model have all roles.
-     * alias roles()
+     * alias roles().
      *
      * @return Collection|Role[]
      */
@@ -94,6 +99,7 @@ trait HasRoles
                 if (empty($role)) {
                     return false;
                 }
+
                 return $this->getStoredRole($role);
             })
             ->filter(function ($role) {
@@ -112,7 +118,7 @@ trait HasRoles
             $class::saved(
                 function ($object) use ($roles, $model) {
                     static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
+                    if (null !== $modelLastFiredOn && $modelLastFiredOn === $model) {
                         return;
                     }
                     $object->roles()->sync($roles, false);
@@ -147,7 +153,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|string|Role ...$roles
+     * @param array|string|Role ...$roles
      *
      * @return $this
      */
@@ -164,8 +170,6 @@ trait HasRoles
      * Determine if the model has (one of) the given role(s).
      *
      * @param array|string|int|Role|Collection $roles
-     *
-     * @return bool
      */
     public function hasRole($roles): bool
     {
@@ -204,8 +208,6 @@ trait HasRoles
      * Alias to hasRole()
      *
      * @param array|string|int|Role|\Illuminate\Database\Eloquent\Collection $roles
-     *
-     * @return bool
      */
     public function hasAnyRole(...$roles): bool
     {
@@ -215,8 +217,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  array|string|int|Role|Collection $roles
-     * @return bool
+     * @param array|string|int|Role|Collection $roles
      */
     public function hasAllRoles($roles): bool
     {
@@ -274,7 +275,7 @@ trait HasRoles
             return explode('|', $pipeString);
         }
 
-        if (! in_array($quoteCharacter, ["'", '"'])) {
+        if (!in_array($quoteCharacter, ["'", '"'])) {
             return explode('|', $pipeString);
         }
 
@@ -283,8 +284,6 @@ trait HasRoles
 
     /**
      * @param string|array|Role|Collection $roles
-     *
-     * @return Collection
      */
     protected function checkMultipleRole($roles): Collection
     {
@@ -305,7 +304,7 @@ trait HasRoles
 
     /**
      * Traverse all roles and view role permissions
-     * check permissions
+     * check permissions.
      *
      * @param string|array|int|Permission $permission
      *
