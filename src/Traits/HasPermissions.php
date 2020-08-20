@@ -66,7 +66,6 @@ trait HasPermissions
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|array|int|Permission $permission
-     * @return bool
      */
     public function checkPermissionTo($permission): bool
     {
@@ -83,7 +82,7 @@ trait HasPermissions
      * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
-     * @return bool
+     *
      * @throws Exception
      */
     public function hasAnyPermission(...$permissions): bool
@@ -103,7 +102,7 @@ trait HasPermissions
      * Determine if the model has all of the given permissions.
      *
      * @param array ...$permissions
-     * @return bool
+     *
      * @throws Exception
      */
     public function hasAllPermissions(...$permissions): bool
@@ -196,7 +195,6 @@ trait HasPermissions
      *
      * @param null $pid
      * @param null $allPermissions
-     * @return Collection
      */
     public function getTreePermissions($pid = null, $allPermissions = null): Collection
     {
@@ -221,6 +219,7 @@ trait HasPermissions
      * Get Permission Model By Name,Id,RouteMethod.
      *
      * @param string|array|Permission|Collection $permissions
+     *
      * @return Permission|Permission[]|Collection
      */
     protected function getStoredPermission($permissions)

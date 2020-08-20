@@ -119,9 +119,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Find a permission by its name (and optionally guardName).
-     *
-     * @param string $name
-     * @return PermissionContract
      */
     public static function findByName(string $name): PermissionContract
     {
@@ -135,9 +132,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Find a permission by its id (and optionally guardName).
-     *
-     * @param int $id
-     * @return PermissionContract
      */
     public static function findById(int $id): PermissionContract
     {
@@ -163,8 +157,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Find or create permission by its name (and optionally guardName).
-     * @param array $attributes
-     * @return PermissionContract
      */
     public static function findOrCreate(array $attributes): PermissionContract
     {
@@ -189,8 +181,6 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached permissions.
-     * @param array $params
-     * @return Collection
      */
     protected static function getPermissions(array $params = []): Collection
     {

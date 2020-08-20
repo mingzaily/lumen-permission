@@ -89,6 +89,7 @@ trait HasRoles
      * Assign the given role to the model.
      *
      * @param string|Role ...$roles
+     *
      * @return $this
      */
     public function assignRole(...$roles)
@@ -153,7 +154,6 @@ trait HasRoles
      * Determine if the model has (one of) the given role(s).
      *
      * @param array|string|int|Role|Collection $roles
-     * @return bool
      */
     public function hasRole($roles): bool
     {
@@ -192,7 +192,6 @@ trait HasRoles
      * Alias to hasRole()
      *
      * @param array|string|int|Role|\Illuminate\Database\Eloquent\Collection $roles
-     * @return bool
      */
     public function hasAnyRole(...$roles): bool
     {
@@ -203,7 +202,6 @@ trait HasRoles
      * Determine if the model has all of the given role(s).
      *
      * @param array|string|int|Role|Collection $roles
-     * @return bool
      */
     public function hasAllRoles($roles): bool
     {
@@ -270,8 +268,6 @@ trait HasRoles
 
     /**
      * @param string|array|Role|Collection $roles
-     * @param bool $given
-     * @return Collection
      */
     protected function checkMultipleRole($roles, bool $given = true): Collection
     {
@@ -297,6 +293,7 @@ trait HasRoles
      * check permissions.
      *
      * @param string|array|int|Permission $permission
+     *
      * @return bool
      */
     public function checkPermission($permission)

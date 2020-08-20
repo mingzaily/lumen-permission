@@ -47,8 +47,6 @@ class PermissionRegistrar
 
     /**
      * PermissionRegistrar constructor.
-     *
-     * @param CacheManager $cacheManager
      */
     public function __construct(CacheManager $cacheManager)
     {
@@ -128,9 +126,6 @@ class PermissionRegistrar
 
     /**
      * Get the permissions based on the passed params.
-     *
-     * @param array $params
-     * @return Collection
      */
     public function getPermissions(array $params = []): Collection
     {

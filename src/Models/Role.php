@@ -86,7 +86,6 @@ class Role extends Model implements RoleContract
     /**
      * Find a role by its name.
      *
-     * @param string $name
      * @return RoleContract|Role
      */
     public static function findByName(string $name): RoleContract
@@ -103,7 +102,6 @@ class Role extends Model implements RoleContract
     /**
      * Find a role by its id.
      *
-     * @param int $id
      * @return RoleContract|Role
      */
     public static function findById(int $id): RoleContract
@@ -119,9 +117,6 @@ class Role extends Model implements RoleContract
 
     /**
      * Find or create role by its name.
-     *
-     * @param string $name
-     * @return RoleContract
      */
     public static function findOrCreate(string $name): RoleContract
     {
@@ -138,7 +133,6 @@ class Role extends Model implements RoleContract
      * Determine if the user may perform the given permission.
      *
      * @param string|int|Permission|array $permission
-     * @return bool
      */
     public function hasPermissionTo($permission): bool
     {
