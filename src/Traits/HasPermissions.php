@@ -12,11 +12,11 @@
 namespace Mingzaily\Permission\Traits;
 
 use Exception;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
-use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
+use Mingzaily\Permission\Exceptions\PermissionIsMenu;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 /**
@@ -32,7 +32,7 @@ trait HasPermissions
     public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
-            if (method_exists($model, 'isForceDeleting') && !$model->isForceDeleting()) {
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
                 return;
             }
 
@@ -42,7 +42,7 @@ trait HasPermissions
 
     public function getPermissionClass()
     {
-        if (!isset($this->permissionClass)) {
+        if (! isset($this->permissionClass)) {
             $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
         }
 
@@ -83,8 +83,8 @@ trait HasPermissions
      * Determine if the model has any of the given permissions.
      *
      * @param array ...$permissions
-     * @return bool
      * @throws Exception
+     * @return bool
      */
     public function hasAnyPermission(...$permissions): bool
     {
@@ -103,15 +103,15 @@ trait HasPermissions
      * Determine if the model has all of the given permissions.
      *
      * @param array ...$permissions
-     * @return bool
      * @throws Exception
+     * @return bool
      */
     public function hasAllPermissions(...$permissions): bool
     {
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (!$this->hasPermissionTo($permission)) {
+            if (! $this->hasPermissionTo($permission)) {
                 return false;
             }
         }
@@ -208,7 +208,7 @@ trait HasPermissions
             ->where('pid', $pid)
             ->map(function (Permission $permission) use ($allPermissions) {
                 $data = $permission;
-                if (!$permission->is_menu) {
+                if (! $permission->is_menu) {
                     return $data;
                 }
                 $data['children'] = $this->getTreePermissions($permission->id, $allPermissions)->values();

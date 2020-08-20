@@ -24,27 +24,24 @@ interface Permission
     /**
      * Find a permission by its name.
      *
-     * @return Permission
-     *
      *@throws PermissionDoesNotExist
+     * @return Permission
      */
     public static function findByName(string $name): self;
 
     /**
      * Find a permission by its id.
      *
-     * @return Permission
-     *
      *@throws PermissionDoesNotExist
+     * @return Permission
      */
     public static function findById(int $id): self;
 
     /**
      * Find a permission by its route and method.
      *
-     * @return Permission
-     *
      *@throws PermissionDoesNotExist
+     * @return Permission
      */
     public static function findByRouteAndMethod(array $permission): self;
 

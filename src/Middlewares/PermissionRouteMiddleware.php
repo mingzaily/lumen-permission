@@ -12,7 +12,6 @@
 namespace Mingzaily\Permission\Middlewares;
 
 use Closure;
-use Illuminate\Http\Request;
 use Mingzaily\Permission\Exceptions\UnauthorizedException;
 
 class PermissionRouteMiddleware
