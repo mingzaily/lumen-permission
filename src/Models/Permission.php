@@ -11,13 +11,13 @@
 
 namespace Mingzaily\Permission\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\PermissionRegistrar;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
 use Mingzaily\Permission\Contracts\Permission as PermissionContract;
 
@@ -126,7 +126,7 @@ class Permission extends Model implements PermissionContract
     public static function findByName(string $name): PermissionContract
     {
         $permission = static::getPermissions(['name' => $name])->first();
-        if (!$permission) {
+        if (! $permission) {
             throw PermissionDoesNotExist::create($name);
         }
 
@@ -143,7 +143,7 @@ class Permission extends Model implements PermissionContract
     {
         $permission = static::getPermissions(['id' => $id])->first();
 
-        if (!$permission) {
+        if (! $permission) {
             throw PermissionDoesNotExist::withId($id);
         }
 
@@ -154,7 +154,7 @@ class Permission extends Model implements PermissionContract
     {
         $permission = static::getPermissions($ability)->first();
 
-        if (!$permission) {
+        if (! $permission) {
             throw PermissionDoesNotExist::withRouteAndMethod($ability);
         }
 
@@ -175,7 +175,7 @@ class Permission extends Model implements PermissionContract
             'method' => $attributes['method'],
         ])->first();
 
-        if (!$permission) {
+        if (! $permission) {
             return static::query()->create([
                 'name' => $attributes['name'],
                 'display_name' => $attributes['display_name'],

@@ -13,9 +13,9 @@ namespace Mingzaily\Permission;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Cache\Repository;
 use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Cache\Repository;
 use Mingzaily\Permission\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 
@@ -80,7 +80,7 @@ class PermissionRegistrar
         }
 
         // if an undefined cache store is specified, fallback to 'array' which is Laravel's closest equiv to 'none'
-        if (!\array_key_exists($cacheDriver, config('cache.stores'))) {
+        if (! \array_key_exists($cacheDriver, config('cache.stores'))) {
             $cacheDriver = 'array';
         }
 
