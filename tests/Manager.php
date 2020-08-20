@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
 use Illuminate\Auth\Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
+use Mingzaily\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;

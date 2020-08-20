@@ -9,14 +9,14 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Contracts\Role;
+use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Mingzaily\Permission\PermissionRegistrar;
+use Mingzaily\Permission\Contracts\Permission;
+use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class CacheTest extends TestCase
 {

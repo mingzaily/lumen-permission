@@ -9,11 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
-use Spatie\Permission\Models\Role;
+use Mingzaily\Permission\Models\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\Models\Permission;
+use Mingzaily\Permission\Models\Permission;
 
 class CommandTest extends TestCase
 {

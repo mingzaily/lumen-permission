@@ -9,35 +9,35 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
 use Illuminate\Support\Facades\Cache;
-use Spatie\Permission\Contracts\Role;
+use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
+use Mingzaily\Permission\PermissionRegistrar;
+use Mingzaily\Permission\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\Permission\PermissionServiceProvider;
+use Mingzaily\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Test\User */
+    /** @var \Mingzaily\Permission\Test\User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Test\Admin */
+    /** @var \Mingzaily\Permission\Test\Admin */
     protected $testAdmin;
 
-    /** @var \Spatie\Permission\Models\Role */
+    /** @var \Mingzaily\Permission\Models\Role */
     protected $testUserRole;
 
-    /** @var \Spatie\Permission\Models\Role */
+    /** @var \Mingzaily\Permission\Models\Role */
     protected $testAdminRole;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Mingzaily\Permission\Models\Permission */
     protected $testUserPermission;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Mingzaily\Permission\Models\Permission */
     protected $testAdminPermission;
 
     public function setUp(): void
@@ -91,7 +91,7 @@ abstract class TestCase extends Orchestra
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 
-        $app['config']->set('cache.prefix', 'spatie_tests---');
+        $app['config']->set('cache.prefix', 'Mingzaily_tests---');
     }
 
     /**

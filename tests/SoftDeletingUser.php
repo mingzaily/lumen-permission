@@ -9,13 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SoftDeletingUser extends User
 {
     use SoftDeletes;
-
-    protected $guard_name = 'web';
 }

@@ -9,11 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
-use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Mingzaily\Permission\Contracts\Role;
+use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
+use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
 
 class HasRolesTest extends TestCase
 {

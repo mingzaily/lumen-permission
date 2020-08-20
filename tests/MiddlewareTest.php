@@ -9,16 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Middlewares\RoleMiddleware;
-use Spatie\Permission\Exceptions\UnauthorizedException;
-use Spatie\Permission\Middlewares\PermissionMiddleware;
-use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
+use Mingzaily\Permission\Contracts\Permission;
+use Mingzaily\Permission\Middlewares\RoleMiddleware;
+use Mingzaily\Permission\Exceptions\UnauthorizedException;
+use Mingzaily\Permission\Middlewares\PermissionMiddleware;
+use Mingzaily\Permission\Middlewares\RoleOrPermissionMiddleware;
 
 class MiddlewareTest extends TestCase
 {

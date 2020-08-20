@@ -9,14 +9,14 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Spatie\Permission\Test;
+namespace Mingzaily\Permission\Test;
 
-use Spatie\Permission\Contracts\Role;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Mingzaily\Permission\Contracts\Role;
+use Mingzaily\Permission\Models\Permission;
+use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
+use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
+use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
+use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
 {
@@ -26,7 +26,7 @@ class RoleTest extends TestCase
 
         Permission::create(['name' => 'other-permission']);
 
-        Permission::create(['name' => 'wrong-guard-permission', 'guard_name' => 'admin']);
+        Permission::create(['name' => 'wrong-guard-permission']);
     }
 
     /** @test */
