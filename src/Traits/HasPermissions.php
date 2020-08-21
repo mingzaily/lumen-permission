@@ -185,7 +185,7 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
-        return $this->permissions()->getResults();
+        return $this->permissions()->getResults()->sortByDesc('weight');
     }
 
     /**
@@ -209,10 +209,13 @@ trait HasPermissions
                 if (! $permission->is_menu) {
                     return $data;
                 }
-                $data['children'] = $this->getTreePermissions($permission->id, $allPermissions)->values();
+
+                $data['children_permissions'] = $this->getTreePermissions($permission->id, $allPermissions)
+                    ->sortByDesc('weight')
+                    ->values();
 
                 return $data;
-            });
+            })->sortByDesc('weight')->values();
     }
 
     /**

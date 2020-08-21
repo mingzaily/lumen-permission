@@ -21,15 +21,15 @@
         }
     ],
     "require": {
-        "php" : "^7.1",
+        "php": "^7.1",
         "illuminate/auth": "^6.0|^7.0",
         "illuminate/container": "^6.0|^7.0",
         "illuminate/contracts": "^6.0|^7.0",
         "illuminate/database": "^6.0|^7.0"
     },
     "require-dev": {
-        "mockery/mockery": "^1.4",
-        "phpunit/phpunit": "^9.3"
+        "orchestra/testbench": "^5.4",
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {

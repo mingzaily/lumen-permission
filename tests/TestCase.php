@@ -106,7 +106,6 @@ abstract class TestCase extends Orchestra
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('email');
-            $table->softDeletes();
         });
 
         $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
@@ -125,14 +124,13 @@ abstract class TestCase extends Orchestra
 
         User::create(['email' => 'test@user.com']);
         Admin::create(['email' => 'admin@user.com']);
-        $app[Role::class]->create(['name' => 'testRole']);
-        $app[Role::class]->create(['name' => 'testRole2']);
-        $app[Role::class]->create(['name' => 'testAdminRole', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'edit-articles']);
-        $app[Permission::class]->create(['name' => 'edit-news']);
-        $app[Permission::class]->create(['name' => 'edit-blog']);
-        $app[Permission::class]->create(['name' => 'admin-permission', 'guard_name' => 'admin']);
-        $app[Permission::class]->create(['name' => 'Edit News']);
+        $app[Role::class]->create(['name' => 'testRole', 'display_name' => 'testRole']);
+        $app[Role::class]->create(['name' => 'testRole2', 'display_name' => 'testRole2']);
+        $app[Role::class]->create(['name' => 'testAdminRole', 'display_name' => 'testAdminRole']);
+        $app[Permission::class]->create(['name' => 'edit.articles', 'display_name' => 'edit-articles', 'route' => '/articles', 'method' => 'PUT']);
+        $app[Permission::class]->create(['name' => 'edit.news', 'display_name' => 'edit-news', 'route' => '/news', 'method' => 'PUT']);
+        $app[Permission::class]->create(['name' => 'edit.blog', 'display_name' => 'edit-blog', 'route' => '/blog', 'method' => 'PUT']);
+        $app[Permission::class]->create(['name' => 'admin.permission', 'display_name' => 'admin-permission', 'route' => '/permission', 'method' => 'PUT']);
     }
 
     /**
