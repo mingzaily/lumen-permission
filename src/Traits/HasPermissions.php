@@ -237,7 +237,7 @@ trait HasPermissions
         }
 
         if (is_array($permissions) && isset($permissions['route']) && isset($permissions['method'])) {
-            return $permissionClass->findByRouteAndMethod($permissions);
+            return $permissionClass->findByRouteAndMethod($permissions['route'], $permissions['method']);
         }
 
         if (is_array($permissions)) {

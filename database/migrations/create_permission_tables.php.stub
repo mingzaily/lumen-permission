@@ -24,8 +24,8 @@ class CreatePermissionTables extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('display_name');
-            $table->string('route');
-            $table->string('method');
+            $table->string('route')->nullable();
+            $table->string('method')->nullable();
             $table->unsignedBigInteger('pid')->nullable();
             $table->unsignedInteger('weight')->default(0);
             $table->unsignedSmallInteger('is_menu')->default(1);

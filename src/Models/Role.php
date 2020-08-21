@@ -153,7 +153,7 @@ class Role extends Model implements RoleContract
         }
 
         if (is_array($permission) && isset($permission['route']) && isset($permission['method'])) {
-            $permission = $permissionClass->findByRouteAndMethod($permission);
+            $permission = $permissionClass->findByRouteAndMethod($permission['route'], $permission['method']);
         }
 
         if (! $permission instanceof Permission) {

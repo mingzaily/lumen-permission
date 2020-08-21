@@ -13,6 +13,7 @@ namespace Mingzaily\Permission\Models;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Mingzaily\Permission\Exceptions\PermissionNotMenu;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -70,15 +71,30 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
+        if (! $attributes['is_menu']
+            && (!isset($attributes['route']) || !isset($attributes['method']))) {
+            throw PermissionNotMenu::notMenu($attributes['name']);
+        }
+
+        $permission = static::getPermissions(['name' => $attributes['name']])->first();
+
+        if ($permission) {
+            throw PermissionAlreadyExists::name($attributes['name']);
+        }
+
+        $permission = static::getPermissions(['display_name' => $attributes['display_name']])->first();
+
+        if ($permission) {
+            throw PermissionAlreadyExists::name($attributes['name']);
+        }
+
         $permission = static::getPermissions([
-            'name' => $attributes['name'],
-            'display_name' => $attributes['display_name'],
             'route' => $attributes['route'],
             'method' => $attributes['method'],
         ])->first();
 
         if ($permission) {
-            throw PermissionAlreadyExists::create($attributes['name']);
+            throw PermissionAlreadyExists::routeMethod($attributes['route'], $attributes['method']);
         }
 
         return static::query()->create($attributes);
@@ -134,7 +150,7 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * Find a permission by its id (and optionally guardName).
+     * Find a permission by its id.
      *
      * @param int $id
      * @return PermissionContract
@@ -150,8 +166,16 @@ class Permission extends Model implements PermissionContract
         return $permission;
     }
 
-    public static function findByRouteAndMethod(array $ability): PermissionContract
+    /**
+     * Find a permission by its route and method.
+     *
+     * @param string $route
+     * @param string $method
+     * @return PermissionContract
+     */
+    public static function findByRouteAndMethod(string $route, string $method): PermissionContract
     {
+        $ability = ['route' => $route, 'method' => $method];
         $permission = static::getPermissions($ability)->first();
 
         if (! $permission) {

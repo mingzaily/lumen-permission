@@ -24,7 +24,7 @@ interface Permission
     /**
      * Find a permission by its name.
      *
-     *@throws PermissionDoesNotExist
+     * @param string $name
      * @return Permission
      */
     public static function findByName(string $name): self;
@@ -32,7 +32,7 @@ interface Permission
     /**
      * Find a permission by its id.
      *
-     *@throws PermissionDoesNotExist
+     * @param int $id
      * @return Permission
      */
     public static function findById(int $id): self;
@@ -40,14 +40,16 @@ interface Permission
     /**
      * Find a permission by its route and method.
      *
-     *@throws PermissionDoesNotExist
+     * @param string $route
+     * @param string $method
      * @return Permission
      */
-    public static function findByRouteAndMethod(array $permission): self;
+    public static function findByRouteAndMethod(string $route, string $method): self;
 
     /**
      * Find or Create a permission by its name and guard name.
      *
+     * @param array $attributes
      * @return Permission
      */
     public static function findOrCreate(array $attributes): self;

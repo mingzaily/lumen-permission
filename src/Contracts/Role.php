@@ -24,7 +24,7 @@ interface Role
     /**
      * Find a role by its name and guard name.
      *
-     * @throws RoleDoesNotExist
+     * @param string $name
      * @return Role
      */
     public static function findByName(string $name): self;
@@ -32,7 +32,7 @@ interface Role
     /**
      * Find a role by its id and guard name.
      *
-     * @throws RoleDoesNotExist
+     * @param int $id
      * @return Role
      */
     public static function findById(int $id): self;
@@ -40,6 +40,7 @@ interface Role
     /**
      * Find or create a role by its name and guard name.
      *
+     * @param string $name
      * @return Role
      */
     public static function findOrCreate(string $name): self;
@@ -48,6 +49,7 @@ interface Role
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
+     * @return bool
      */
     public function hasPermissionTo($permission): bool;
 }
