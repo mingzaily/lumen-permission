@@ -12,7 +12,6 @@
 namespace Mingzaily\Permission\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 interface Permission
 {

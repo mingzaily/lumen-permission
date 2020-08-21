@@ -11,7 +11,6 @@
 
 namespace Mingzaily\Permission\Contracts;
 
-use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 interface Role

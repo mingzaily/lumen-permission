@@ -13,9 +13,9 @@ namespace Mingzaily\Permission\Models;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Mingzaily\Permission\Exceptions\PermissionNotMenu;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Mingzaily\Permission\Exceptions\PermissionNotMenu;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
@@ -72,7 +72,7 @@ class Permission extends Model implements PermissionContract
     public static function create(array $attributes = [])
     {
         if (! $attributes['is_menu']
-            && (!isset($attributes['route']) || !isset($attributes['method']))) {
+            && (! isset($attributes['route']) || ! isset($attributes['method']))) {
             throw PermissionNotMenu::notMenu($attributes['name']);
         }
 
