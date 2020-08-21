@@ -3,7 +3,7 @@
 ![StyleCI](https://github.styleci.io/repos/287014448/shield)
 ![GitHub repo size](https://img.shields.io/github/repo-size/mingzaily/lumen-permission?style=flat-square)
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/mingzaily/lumen-permission?style=flat-square)
-![Packagist Version](https://img.shields.io/packagist/v/mingzaily/lumen-permission?style=flat-square)
+![Packagist Version](https://img.shields.io/packagist/v/mingzaily/lumen-permission?include_prereleases&style=flat-square)
 ![Packagist License](https://img.shields.io/packagist/l/mingzaily/lumen-permission?style=flat-square)
 
 简体中文 | [English](./README.en.md) 
