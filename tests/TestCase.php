@@ -77,7 +77,6 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
         $app['config']->set('auth.providers.users', ['driver' => 'eloquent', 'model' => User::class]);
 
-
         $app['config']->set('cache.prefix', 'mingzaily_tests---');
 
         //

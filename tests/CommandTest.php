@@ -17,7 +17,6 @@ use Mingzaily\Permission\Models\Permission;
 
 class CommandTest extends TestCase
 {
-
     /** @test */
     public function it_can_show_permission_tables()
     {
