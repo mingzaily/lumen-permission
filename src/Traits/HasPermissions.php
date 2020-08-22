@@ -111,7 +111,7 @@ trait HasPermissions
         $permissions = collect($permissions)->flatten();
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission)) {
+            if (! $this->checkPermissionTo($permission)) {
                 return false;
             }
         }
@@ -185,7 +185,7 @@ trait HasPermissions
      */
     public function getAllPermissions(): Collection
     {
-        return $this->permissions()->getResults()->sortByDesc('weight');
+        return $this->permissions->sortByDesc('weight');
     }
 
     /**

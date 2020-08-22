@@ -13,7 +13,6 @@ namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
-use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
 
 class HasRolesTest extends TestCase
 {
@@ -22,24 +21,17 @@ class HasRolesTest extends TestCase
     {
         $this->assertFalse($this->testUser->hasRole('testRole'));
 
-        $role = app(Role::class)->findOrCreate('testRoleInWebGuard', 'web');
+        $role = app(Role::class)->findOrCreate(['name' => 'testRole3']);
 
         $this->assertFalse($this->testUser->hasRole($role));
 
         $this->testUser->assignRole($role);
         $this->assertTrue($this->testUser->hasRole($role));
         $this->assertTrue($this->testUser->hasRole($role->name));
-        $this->assertTrue($this->testUser->hasRole($role->name, $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole([$role->name, 'fakeRole'], $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole($role->id, $role->guard_name));
-        $this->assertTrue($this->testUser->hasRole([$role->id, 'fakeRole'], $role->guard_name));
+        $this->assertTrue($this->testUser->hasRole([$role->name, 'fakeRole']));
+        $this->assertTrue($this->testUser->hasRole($role->id));
 
-        $this->assertFalse($this->testUser->hasRole($role->name, 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole([$role->name, 'fakeRole'], 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole($role->id, 'fakeGuard'));
-        $this->assertFalse($this->testUser->hasRole([$role->id, 'fakeRole'], 'fakeGuard'));
-
-        $role = app(Role::class)->findOrCreate('testRoleInWebGuard2', 'web');
+        $role = app(Role::class)->findOrCreate(['name' => 'testRole4']);
         $this->assertFalse($this->testUser->hasRole($role));
     }
 
@@ -74,18 +66,6 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_assign_and_remove_a_role_on_a_permission()
-    {
-        $this->testUserPermission->assignRole('testRole');
-
-        $this->assertTrue($this->testUserPermission->hasRole('testRole'));
-
-        $this->testUserPermission->removeRole('testRole');
-
-        $this->assertFalse($this->testUserPermission->hasRole('testRole'));
-    }
-
-    /** @test */
     public function it_can_assign_a_role_using_an_object()
     {
         $this->testUser->assignRole($this->testUserRole);
@@ -101,25 +81,25 @@ class HasRolesTest extends TestCase
         $this->assertTrue($this->testUser->hasRole($this->testUserRole));
     }
 
-    /** @test */
-    public function it_can_assign_multiple_roles_at_once()
-    {
-        $this->testUser->assignRole($this->testUserRole->id, 'testRole2');
-
-        $this->assertTrue($this->testUser->hasRole('testRole'));
-
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
-
-    /** @test */
-    public function it_can_assign_multiple_roles_using_an_array()
-    {
-        $this->testUser->assignRole([$this->testUserRole->id, 'testRole2']);
-
-        $this->assertTrue($this->testUser->hasRole('testRole'));
-
-        $this->assertTrue($this->testUser->hasRole('testRole2'));
-    }
+//    /** @test */
+//    public function it_can_assign_multiple_roles_at_once()
+//    {
+//        $this->testUser->assignRole($this->testUserRole->id, 'testRole2');
+//
+//        $this->assertTrue($this->testUser->hasRole('testRole'));
+//
+//        $this->assertTrue($this->testUser->hasRole('testRole2'));
+//    }
+//
+//    /** @test */
+//    public function it_can_assign_multiple_roles_using_an_array()
+//    {
+//        $this->testUser->assignRole([$this->testUserRole->id, 'testRole2']);
+//
+//        $this->assertTrue($this->testUser->hasRole('testRole'));
+//
+//        $this->assertTrue($this->testUser->hasRole('testRole2'));
+//    }
 
     /** @test */
     public function it_does_not_remove_already_associated_roles_when_assigning_new_roles()

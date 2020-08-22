@@ -39,10 +39,10 @@ interface Role
     /**
      * Find or create a role by its name and guard name.
      *
-     * @param string $name
+     * @param array $attributes
      * @return Role
      */
-    public static function findOrCreate(string $name): self;
+    public static function findOrCreate(array $attributes): self;
 
     /**
      * Determine if the user may perform the given permission.

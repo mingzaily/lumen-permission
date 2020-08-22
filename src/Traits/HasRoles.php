@@ -82,7 +82,7 @@ trait HasRoles
      */
     public function getAllRoles()
     {
-        return $this->roles()->getResults();
+        return $this->roles;
     }
 
     /**
@@ -299,7 +299,7 @@ trait HasRoles
      */
     public function checkPermission($permission)
     {
-        return $this->roles()->getResults()->map(function ($role) use ($permission) {
+        return $this->roles->map(function (Role $role) use ($permission) {
             return $role->checkPermissionTo($permission);
         })->filter(function ($isOk) {
             return $isOk;

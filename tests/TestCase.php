@@ -22,23 +22,14 @@ use Mingzaily\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Mingzaily\Permission\Test\User */
+    /** @var User */
     protected $testUser;
-
-    /** @var \Mingzaily\Permission\Test\Admin */
-    protected $testAdmin;
 
     /** @var \Mingzaily\Permission\Models\Role */
     protected $testUserRole;
 
-    /** @var \Mingzaily\Permission\Models\Role */
-    protected $testAdminRole;
-
     /** @var \Mingzaily\Permission\Models\Permission */
     protected $testUserPermission;
-
-    /** @var \Mingzaily\Permission\Models\Permission */
-    protected $testAdminPermission;
 
     public function setUp(): void
     {
@@ -47,11 +38,11 @@ abstract class TestCase extends Orchestra
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
 
-        $this->testUser = User::first();
+        $this->testUser = User::query()->first();
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);
 
-        $this->testAdmin = Admin::first();
+        $this->testAdmin = Admin::query()->first();
         $this->testAdminRole = app(Role::class)->find(3);
         $this->testAdminPermission = app(Permission::class)->find(4);
     }
@@ -82,16 +73,15 @@ abstract class TestCase extends Orchestra
             'prefix' => '',
         ]);
 
-        $app['config']->set('view.paths', [__DIR__.'/resources/views']);
+        // Set-up users
+        $app['config']->set('auth.guards.api', ['driver' => 'session', 'provider' => 'users']);
+        $app['config']->set('auth.providers.users', ['driver' => 'eloquent', 'model' => User::class]);
 
-        // Set-up admin guard
-        $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);
-        $app['config']->set('auth.providers.admins', ['driver' => 'eloquent', 'model' => Admin::class]);
 
-        // Use test User model for users provider
-        $app['config']->set('auth.providers.users.model', User::class);
+        $app['config']->set('cache.prefix', 'mingzaily_tests---');
 
-        $app['config']->set('cache.prefix', 'Mingzaily_tests---');
+        //
+        $app['config']->set('permission.model_has_multiple_roles', false);
     }
 
     /**
@@ -126,7 +116,7 @@ abstract class TestCase extends Orchestra
         Admin::create(['email' => 'admin@user.com']);
         $app[Role::class]->create(['name' => 'testRole', 'display_name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2', 'display_name' => 'testRole2']);
-        $app[Role::class]->create(['name' => 'testAdminRole', 'display_name' => 'testAdminRole']);
+        $app[Role::class]->create(['name' => 'testRole3', 'display_name' => 'testRole3']);
         $app[Permission::class]->create(['name' => 'edit.articles', 'display_name' => 'edit-articles', 'route' => '/articles', 'method' => 'PUT']);
         $app[Permission::class]->create(['name' => 'edit.news', 'display_name' => 'edit-news', 'route' => '/news', 'method' => 'PUT']);
         $app[Permission::class]->create(['name' => 'edit.blog', 'display_name' => 'edit-blog', 'route' => '/blog', 'method' => 'PUT']);

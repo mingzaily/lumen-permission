@@ -120,15 +120,15 @@ class Role extends Model implements RoleContract
     /**
      * Find or create role by its name.
      *
-     * @param string $name
+     * @param array $attributes
      * @return RoleContract
      */
-    public static function findOrCreate(string $name): RoleContract
+    public static function findOrCreate(array $attributes = []): RoleContract
     {
-        $role = static::where('name', $name)->first();
+        $role = static::where(['name' => $attributes['name']])->first();
 
         if (! $role) {
-            return static::query()->create(['name' => $name]);
+            return static::query()->create($attributes);
         }
 
         return $role;
@@ -160,10 +160,12 @@ class Role extends Model implements RoleContract
             throw new PermissionDoesNotExist();
         }
 
+        $bool = $this->permissions->contains('id', $permission->id);
+
         if ($permission->is_menu) {
             throw PermissionIsMenu::isMenu($permission->name);
         }
 
-        return $this->permissions->contains('id', $permission->id);
+        return $bool;
     }
 }

@@ -71,7 +71,7 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
-        if (! $attributes['is_menu']
+        if (! isset($attributes['is_menu'])
             && (! isset($attributes['route']) || ! isset($attributes['method']))) {
             throw PermissionNotMenu::notMenu($attributes['name']);
         }
@@ -200,12 +200,7 @@ class Permission extends Model implements PermissionContract
         ])->first();
 
         if (! $permission) {
-            return static::query()->create([
-                'name' => $attributes['name'],
-                'display_name' => $attributes['display_name'],
-                'route' => $attributes['route'],
-                'method' => $attributes['method'],
-            ]);
+            return static::create();
         }
 
         return $permission;

@@ -25,10 +25,10 @@ class CreatePermissionTables extends Migration
             $table->string('name');
             $table->string('display_name');
             $table->string('route')->nullable();
-            $table->string('method')->nullable();
+            $table->enum('method', ['GET','HEAD','POST','PUT','PATCH','DELETE','CONNECT','OPTIONS','TRACE'])->nullable();
             $table->unsignedBigInteger('pid')->nullable();
             $table->unsignedInteger('weight')->default(0);
-            $table->unsignedSmallInteger('is_menu')->default(1);
+            $table->unsignedTinyInteger('is_menu')->default(0);
             $table->timestamps();
 
             $table->index(['route', 'method'], 'permission_route_method_index');
