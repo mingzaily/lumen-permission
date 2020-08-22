@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class CacheTest extends TestCase
 {
