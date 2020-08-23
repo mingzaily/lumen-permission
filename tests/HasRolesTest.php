@@ -12,8 +12,8 @@
 namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Role;
-use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
+use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 
 class HasRolesTest extends TestCase
 {
