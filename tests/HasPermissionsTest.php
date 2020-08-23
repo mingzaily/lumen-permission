@@ -13,8 +13,6 @@ namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
-use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class HasPermissionsTest extends TestCase
 {
