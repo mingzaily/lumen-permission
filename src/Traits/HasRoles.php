@@ -11,12 +11,12 @@
 
 namespace Mingzaily\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
-use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\PermissionRegistrar;
+use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Mingzaily\Permission\Exceptions\UnauthorizedException;
 
 /**
