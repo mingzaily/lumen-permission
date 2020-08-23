@@ -118,7 +118,7 @@ class Permission extends Model implements PermissionContract
      *
      * @return HasMany
      */
-    public function children()
+    private function children()
     {
         return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
     }
@@ -126,10 +126,17 @@ class Permission extends Model implements PermissionContract
     /**
      * @return HasMany
      */
-    public function childrenPermissions()
+    private function childrenPermissions()
     {
         return $this->children()
             ->with('childrenPermissions')
+            ->orderBy('weight', 'desc');
+    }
+
+    public function TreeList()
+    {
+        return self::with('childrenPermissions')
+            ->whereNull('pid')
             ->orderBy('weight', 'desc');
     }
 

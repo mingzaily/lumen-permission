@@ -11,9 +11,10 @@
 
 namespace Mingzaily\Permission\Traits;
 
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
-use Mingzaily\Permission\Models\Role;
-use Mingzaily\Permission\Models\Permission;
+use Mingzaily\Permission\Contracts\Role;
+use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Exceptions\UnauthorizedException;
@@ -22,7 +23,6 @@ use Mingzaily\Permission\Exceptions\UnauthorizedException;
  * Trait HasRoles.
  *
  * @property Collection|Role[] $roles
- * @property int|null          $roles_count
  */
 trait HasRoles
 {
@@ -51,7 +51,7 @@ trait HasRoles
     /**
      * A model may have multiple roles.
      */
-    public function roles(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public function roles(): MorphToMany
     {
         return $this->morphToMany(
             config('permission.models.role'),
@@ -221,7 +221,7 @@ trait HasRoles
             return $role instanceof Role ? $role->name : $role;
         });
 
-        return $roles->intersect($this->getRoleNames()) === $roles;
+        return $roles->intersect($this->getRoleNames()) == $roles;
     }
 
     public function getRoleNames(): Collection
@@ -280,9 +280,9 @@ trait HasRoles
             throw RoleAlreadyExists::assign();
         }
 
-        if ($this->getAllRoles()->count() >= 1
+        if ($this->roles()->count() >= 1
             && $given
-            && ! in_array($this->getFirstRole()->name, $roles->toArray())
+            && $this->getStoredRole($roles->first())->id !== $this->getFirstRole()->id
             && ! config('permission.model_has_multiple_roles')) {
             throw RoleAlreadyExists::assignExits($this->getFirstRole()->name);
         }

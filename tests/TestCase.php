@@ -41,10 +41,6 @@ abstract class TestCase extends Orchestra
         $this->testUser = User::query()->first();
         $this->testUserRole = app(Role::class)->find(1);
         $this->testUserPermission = app(Permission::class)->find(1);
-
-        $this->testAdmin = Admin::query()->first();
-        $this->testAdminRole = app(Role::class)->find(3);
-        $this->testAdminPermission = app(Permission::class)->find(4);
     }
 
     /**
@@ -97,11 +93,6 @@ abstract class TestCase extends Orchestra
             $table->string('email');
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('admins', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
-        });
-
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
             $app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
@@ -112,7 +103,7 @@ abstract class TestCase extends Orchestra
         (new \CreatePermissionTables())->up();
 
         User::create(['email' => 'test@user.com']);
-        Admin::create(['email' => 'admin@user.com']);
+        User::create(['email' => 'test2@user.com']);
         $app[Role::class]->create(['name' => 'testRole', 'display_name' => 'testRole']);
         $app[Role::class]->create(['name' => 'testRole2', 'display_name' => 'testRole2']);
         $app[Role::class]->create(['name' => 'testRole3', 'display_name' => 'testRole3']);
