@@ -148,7 +148,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_giving_a_permission_to_a_role()
     {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+        $this->testRole->givePermissionTo($this->testPermission);
 
         $this->resetQueryCount();
 
@@ -160,59 +160,59 @@ class CacheTest extends TestCase
     /** @test */
     public function role_check_permission_to_should_use_the_cache()
     {
-        $this->testUserRole->givePermissionTo(['edit.articles', 'edit.news', 'edit.blog']);
+        $this->testRole->givePermissionTo(['edit.articles', 'edit.news', 'edit.blog']);
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit.articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.articles'));
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit.news'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.news'));
         $this->assertQueryCount(0);
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit.blog'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.blog'));
         $this->assertQueryCount(0);
 
         $this->resetQueryCount();
-        $this->assertFalse($this->testUserRole->hasPermissionTo('admin.permission'));
+        $this->assertFalse($this->testRole->hasPermissionTo('admin.permission'));
         $this->assertQueryCount(0);
     }
 
     /** @test */
     public function user_check_permission_should_use_the_cache()
     {
-        $this->testUserRole->givePermissionTo(['edit.articles', 'edit.news', 'edit.blog']);
+        $this->testRole->givePermissionTo(['edit.articles', 'edit.news', 'edit.blog']);
         $this->testUser->assignRole('testRole');
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUser->checkPermission('edit.articles'));
+        $this->assertTrue($this->testUser->checkPermissionViaRole('edit.articles'));
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUser->checkPermission('edit.news'));
+        $this->assertTrue($this->testUser->checkPermissionViaRole('edit.news'));
         $this->assertQueryCount(0);
 
         $this->resetQueryCount();
-        $this->assertTrue($this->testUser->checkPermission('edit.blog'));
+        $this->assertTrue($this->testUser->checkPermissionViaRole('edit.blog'));
         $this->assertQueryCount(0);
 
         $this->resetQueryCount();
-        $this->assertFalse($this->testUser->checkPermission('admin.permission'));
+        $this->assertFalse($this->testUser->checkPermissionViaRole('admin.permission'));
         $this->assertQueryCount(0);
     }
 
     /** @test */
     public function get_all_permissions_should_use_the_cache()
     {
-        $this->testUserRole->givePermissionTo($expected = ['edit.articles', 'edit.news']);
+        $this->testRole->givePermissionTo($expected = ['edit.articles', 'edit.news']);
 
         $this->resetQueryCount();
         $this->registrar->getPermissions();
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         $this->resetQueryCount();
-        $actual = $this->testUserRole->getAllPermissions()->pluck('name')->sort()->values();
+        $actual = $this->testRole->getAllPermissions()->pluck('name')->sort()->values();
         $this->assertEquals($actual, collect($expected));
         $this->assertQueryCount(0);
     }

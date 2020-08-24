@@ -38,7 +38,7 @@ class PermissionTest extends TestCase
     {
         $this->assertEquals(
             $this->app['config']->get('auth.defaults.guard'),
-            $this->testUserPermission->guard_name
+            $this->testPermission->guard_name
         );
     }
 
@@ -47,18 +47,18 @@ class PermissionTest extends TestCase
     {
         $this->testAdmin->givePermissionTo($this->testAdminPermission);
 
-        $this->testUser->givePermissionTo($this->testUserPermission);
+        $this->testUser->givePermissionTo($this->testPermission);
 
-        $this->assertCount(1, $this->testUserPermission->users);
-        $this->assertTrue($this->testUserPermission->users->first()->is($this->testUser));
-        $this->assertInstanceOf(User::class, $this->testUserPermission->users->first());
+        $this->assertCount(1, $this->testPermission->users);
+        $this->assertTrue($this->testPermission->users->first()->is($this->testUser));
+        $this->assertInstanceOf(User::class, $this->testPermission->users->first());
     }
 
     /** @test */
     public function it_is_retrievable_by_id()
     {
-        $permission_by_id = app(Permission::class)->findById($this->testUserPermission->id);
+        $permission_by_id = app(Permission::class)->findById($this->testPermission->id);
 
-        $this->assertEquals($this->testUserPermission->id, $permission_by_id->id);
+        $this->assertEquals($this->testPermission->id, $permission_by_id->id);
     }
 }

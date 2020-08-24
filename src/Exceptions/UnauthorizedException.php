@@ -31,7 +31,7 @@ class UnauthorizedException extends HttpException
 
     public static function notLoggedIn(): self
     {
-        return new static(403, 'User is not logged in.', null, []);
+        return new static(401, 'User is not logged in.', null, []);
     }
 
     public static function notAssignRole(): self

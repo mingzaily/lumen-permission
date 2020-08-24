@@ -26,10 +26,10 @@ abstract class TestCase extends Orchestra
     protected $testUser;
 
     /** @var \Mingzaily\Permission\Models\Role */
-    protected $testUserRole;
+    protected $testRole;
 
     /** @var \Mingzaily\Permission\Models\Permission */
-    protected $testUserPermission;
+    protected $testPermission;
 
     public function setUp(): void
     {
@@ -39,8 +39,8 @@ abstract class TestCase extends Orchestra
         $this->setUpDatabase($this->app);
 
         $this->testUser = User::query()->first();
-        $this->testUserRole = app(Role::class)->find(1);
-        $this->testUserPermission = app(Permission::class)->find(1);
+        $this->testRole = app(Role::class)->find(1);
+        $this->testPermission = app(Permission::class)->find(1);
     }
 
     /**

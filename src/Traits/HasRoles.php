@@ -297,7 +297,7 @@ trait HasRoles
      * @param string|array|int|Permission $permission
      * @return bool
      */
-    public function checkPermission($permission)
+    public function checkPermissionViaRole($permission)
     {
         return $this->roles->map(function (Role $role) use ($permission) {
             return $role->checkPermissionTo($permission);
@@ -312,7 +312,7 @@ trait HasRoles
      *
      * @return Collection
      */
-    public function getPermissions()
+    public function getPermissionsViaRole()
     {
         return $this->roles->map(function (Role $role) {
             return $role->getAllPermissions();

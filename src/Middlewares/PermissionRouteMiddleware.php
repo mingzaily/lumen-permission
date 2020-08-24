@@ -16,13 +16,13 @@ use Mingzaily\Permission\Exceptions\UnauthorizedException;
 
 class PermissionRouteMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $ability)
     {
         if (app('auth')->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }
 
-        $ability = $request->getPathInfo().'|'.$request->getMethod();
+        $ability = $ability ?? $request->getPathInfo().'@'.$request->getMethod();
         if (app('auth')->user()->can($ability)) {
             return $next($request);
         }

@@ -71,7 +71,7 @@ class RouteTest extends TestCase
     protected function getRouteResponse()
     {
         return function () {
-            return (new Response())->setContent('<html></html>');
+            return (new Response())->setContent('');
         };
     }
 }

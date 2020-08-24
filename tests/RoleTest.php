@@ -34,11 +34,11 @@ class RoleTest extends TestCase
     {
         $this->testAdmin->assignRole($this->testAdminRole);
 
-        $this->testUser->assignRole($this->testUserRole);
+        $this->testUser->assignRole($this->testRole);
 
-        $this->assertCount(1, $this->testUserRole->users);
-        $this->assertTrue($this->testUserRole->users->first()->is($this->testUser));
-        $this->assertInstanceOf(User::class, $this->testUserRole->users->first());
+        $this->assertCount(1, $this->testRole->users);
+        $this->assertTrue($this->testRole->users->first()->is($this->testUser));
+        $this->assertInstanceOf(User::class, $this->testRole->users->first());
 
         $this->assertCount(1, $this->testAdminRole->users);
         $this->assertTrue($this->testAdminRole->users->first()->is($this->testAdmin));
@@ -57,9 +57,9 @@ class RoleTest extends TestCase
     /** @test */
     public function it_can_be_given_a_permission()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-articles'));
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class RoleTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->givePermissionTo('create-evil-empire');
+        $this->testRole->givePermissionTo('create-evil-empire');
     }
 
     /** @test */
@@ -75,107 +75,107 @@ class RoleTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->givePermissionTo('admin-permission');
+        $this->testRole->givePermissionTo('admin-permission');
 
         $this->expectException(GuardDoesNotMatch::class);
 
-        $this->testUserRole->givePermissionTo($this->testAdminPermission);
+        $this->testRole->givePermissionTo($this->testAdminPermission);
     }
 
     /** @test */
     public function it_can_be_given_multiple_permissions_using_an_array()
     {
-        $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news']);
+        $this->testRole->givePermissionTo(['edit-articles', 'edit-news']);
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-news'));
     }
 
     /** @test */
     public function it_can_be_given_multiple_permissions_using_multiple_arguments()
     {
-        $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
+        $this->testRole->givePermissionTo('edit-articles', 'edit-news');
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-news'));
     }
 
     /** @test */
     public function it_can_sync_permissions()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
-        $this->testUserRole->syncPermissions('edit-news');
+        $this->testRole->syncPermissions('edit-news');
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo('edit-articles'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit-articles'));
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-news'));
     }
 
     /** @test */
     public function it_throws_an_exception_when_syncing_permissions_that_do_not_exist()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->syncPermissions('permission-does-not-exist');
+        $this->testRole->syncPermissions('permission-does-not-exist');
     }
 
     /** @test */
     public function it_throws_an_exception_when_syncing_permissions_that_belong_to_a_different_guard()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->syncPermissions('admin-permission');
+        $this->testRole->syncPermissions('admin-permission');
 
         $this->expectException(GuardDoesNotMatch::class);
 
-        $this->testUserRole->syncPermissions($this->testAdminPermission);
+        $this->testRole->syncPermissions($this->testAdminPermission);
     }
 
     /** @test */
     public function it_will_remove_all_permissions_when_passing_an_empty_array_to_sync_permissions()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
-        $this->testUserRole->givePermissionTo('edit-news');
+        $this->testRole->givePermissionTo('edit-news');
 
-        $this->testUserRole->syncPermissions([]);
+        $this->testRole->syncPermissions([]);
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo('edit-articles'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit-articles'));
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo('edit-news'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit-news'));
     }
 
     /** @test */
     public function it_can_revoke_a_permission()
     {
-        $this->testUserRole->givePermissionTo('edit-articles');
+        $this->testRole->givePermissionTo('edit-articles');
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit-articles'));
 
-        $this->testUserRole->revokePermissionTo('edit-articles');
+        $this->testRole->revokePermissionTo('edit-articles');
 
-        $this->testUserRole = $this->testUserRole->fresh();
+        $this->testRole = $this->testRole->fresh();
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo('edit-articles'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit-articles'));
     }
 
     /** @test */
     public function it_can_be_given_a_permission_using_objects()
     {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+        $this->testRole->givePermissionTo($this->testPermission);
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo($this->testUserPermission));
+        $this->assertTrue($this->testRole->hasPermissionTo($this->testPermission));
     }
 
     /** @test */
     public function it_returns_false_if_it_does_not_have_the_permission()
     {
-        $this->assertFalse($this->testUserRole->hasPermissionTo('other-permission'));
+        $this->assertFalse($this->testRole->hasPermissionTo('other-permission'));
     }
 
     /** @test */
@@ -183,7 +183,7 @@ class RoleTest extends TestCase
     {
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->hasPermissionTo('doesnt-exist');
+        $this->testRole->hasPermissionTo('doesnt-exist');
     }
 
     /** @test */
@@ -191,7 +191,7 @@ class RoleTest extends TestCase
     {
         $permission = app(Permission::class)->findByName('other-permission');
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
+        $this->assertFalse($this->testRole->hasPermissionTo($permission));
     }
 
     /** @test */
@@ -199,13 +199,13 @@ class RoleTest extends TestCase
     {
         $permission = app(Permission::class)->findOrCreate('another-permission');
 
-        $this->assertFalse($this->testUserRole->hasPermissionTo($permission));
+        $this->assertFalse($this->testRole->hasPermissionTo($permission));
 
-        $this->testUserRole->givePermissionTo($permission);
+        $this->testRole->givePermissionTo($permission);
 
-        $this->testUserRole = $this->testUserRole->fresh();
+        $this->testRole = $this->testRole->fresh();
 
-        $this->assertTrue($this->testUserRole->hasPermissionTo('another-permission'));
+        $this->assertTrue($this->testRole->hasPermissionTo('another-permission'));
     }
 
     /** @test */
@@ -229,7 +229,7 @@ class RoleTest extends TestCase
 
         $permission = app(Permission::class)->findByName('wrong-guard-permission', 'admin');
 
-        $this->testUserRole->hasPermissionTo($permission);
+        $this->testRole->hasPermissionTo($permission);
     }
 
     /** @test */
@@ -245,7 +245,7 @@ class RoleTest extends TestCase
     {
         $this->assertEquals(
             $this->app['config']->get('auth.defaults.guard'),
-            $this->testUserRole->guard_name
+            $this->testRole->guard_name
         );
     }
 }

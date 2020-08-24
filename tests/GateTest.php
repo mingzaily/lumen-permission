@@ -40,12 +40,12 @@ class GateTest extends TestCase
     /** @test */
     public function it_can_determine_if_a_user_has_a_permission_through_roles()
     {
-        $this->testUserRole->givePermissionTo($this->testUserPermission);
+        $this->testRole->givePermissionTo($this->testPermission);
         $this->testUser->assignRole('testRole');
 
-        $this->assertTrue($this->testUser->can($this->testUserPermission->name));
+        $this->assertTrue($this->testUser->can($this->testPermission->name));
 
-        $this->assertTrue($this->testUser->can($this->testUserPermission->route.'|'.$this->testUserPermission->method));
+        $this->assertTrue($this->testUser->can($this->testPermission->route.'|'.$this->testPermission->method));
 
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 

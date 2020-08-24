@@ -13,11 +13,12 @@ namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\Contracts\Permission;
+use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class HasPermissionsTest extends TestCase
 {
     /** @test */
-    public function it_can_list_all_the_permissions_via_roles_of_user()
+    public function it_can_given_permission_via_roles_of_user()
     {
         // change config
         $this->app['config']->set('permission.model_has_multiple_roles', true);
@@ -25,167 +26,95 @@ class HasPermissionsTest extends TestCase
         $roleModel = app(Role::class);
         $roleModel->findByName('testRole2')->givePermissionTo('edit.news');
 
-        $this->testUserRole->givePermissionTo('edit.articles');
+        $this->testRole->givePermissionTo('edit.articles');
         $this->testUser->assignRole('testRole', 'testRole2');
 
         $this->assertEquals(
             collect(['edit.articles', 'edit.news']),
-            $this->testUser->getPermissions()->pluck('name')
+            $this->testUser->getPermissionsViaRole()->pluck('name')
         );
     }
 
     /** @test */
-    public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
+    public function it_can_given_permission_of_role()
     {
-        $this->testUser->givePermissionTo('edit-news');
-
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+        $this->testRole->givePermissionTo(['edit.articles', 'edit.news']);
 
         $this->assertEquals(
-            collect(['edit-articles', 'edit-news']),
-            $this->testUser->getAllPermissions()->pluck('name')->sort()->values()
+            collect(['edit.articles', 'edit.news']),
+            $this->testRole->getAllPermissions()->flatten()->pluck('name')
         );
     }
 
     /** @test */
-    public function it_can_sync_multiple_permissions()
+    public function it_can_given_and_remove_a_permission()
     {
-        $this->testUser->givePermissionTo('edit-news');
+        $this->assertFalse($this->testRole->hasPermissionTo('edit.news'));
 
-        $this->testUser->syncPermissions('edit-articles', 'edit-blog');
+        $this->testRole->givePermissionTo('edit.news');
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.news'));
 
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
+        $this->testRole->revokePermissionTo('edit.news');
 
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit.news'));
     }
 
     /** @test */
-    public function it_can_sync_multiple_permissions_by_id()
+    public function it_can_given_a_permission_using_an_object()
     {
-        $this->testUser->givePermissionTo('edit-news');
+        $this->testRole->givePermissionTo($this->testPermission);
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
-
-        $this->testUser->syncPermissions($ids);
-
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
-
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
-
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo($this->testPermission));
     }
 
     /** @test */
-    public function sync_permission_ignores_null_inputs()
+    public function it_can_given_a_permission_using_an_id()
     {
-        $this->testUser->givePermissionTo('edit-news');
+        $this->testRole->givePermissionTo($this->testPermission->id);
 
-        $ids = app(Permission::class)::whereIn('name', ['edit-articles', 'edit-blog'])->pluck('id');
-
-        $ids->push(null);
-
-        $this->testUser->syncPermissions($ids);
-
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
-
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-blog'));
-
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo($this->testPermission));
     }
 
     /** @test */
-    public function it_does_not_remove_already_associated_permissions_when_assigning_new_permissions()
+    public function it_can_sync_permissions_from_a_string()
     {
-        $this->testUser->givePermissionTo('edit-news');
+        $this->testRole->givePermissionTo('edit.news');
 
-        $this->testUser->givePermissionTo('edit-articles');
+        $this->testRole->syncPermissions('edit.articles');
 
-        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+        $this->assertFalse($this->testRole->hasPermissionTo('edit.news'));
+
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.articles'));
     }
 
     /** @test */
-    public function it_does_not_throw_an_exception_when_assigning_a_permission_that_is_already_assigned()
+    public function it_can_sync_permissions_by_array()
     {
-        $this->testUser->givePermissionTo('edit-news');
+        $this->testRole->syncPermissions(['edit.news', 'edit.articles']);
 
-        $this->testUser->givePermissionTo('edit-news');
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.news'));
 
-        $this->assertTrue($this->testUser->fresh()->hasDirectPermission('edit-news'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.articles'));
     }
 
     /** @test */
-    public function it_can_sync_permissions_to_a_model_that_is_not_persisted()
+    public function it_will_remove_all_permissions_when_an_empty_array()
     {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncPermissions('edit-articles');
-        $user->save();
+        $this->testRole->givePermissionTo('edit.articles', 'edit.articles');
 
-        $this->assertTrue($user->hasPermissionTo('edit-articles'));
+        $this->assertTrue($this->testRole->hasPermissionTo('edit.articles'));
 
-        $user->syncPermissions('edit-articles');
-        $this->assertTrue($user->hasPermissionTo('edit-articles'));
-        $this->assertTrue($user->fresh()->hasPermissionTo('edit-articles'));
+        $this->testRole->syncPermissions([]);
+
+        $this->assertFalse($this->testRole->hasPermissionTo('edit.articles'));
     }
 
     /** @test */
-    public function calling_givePermissionTo_before_saving_object_doesnt_interfere_with_other_objects()
+    public function it_throws_an_exception_when_permission_does_not()
     {
-        $user = new User(['email' => 'test@user.com']);
-        $user->givePermissionTo('edit-news');
-        $user->save();
+        $this->expectException(PermissionDoesNotExist::class);
 
-        $user2 = new User(['email' => 'test2@user.com']);
-        $user2->givePermissionTo('edit-articles');
-        $user2->save();
-
-        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
-        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function calling_syncPermissions_before_saving_object_doesnt_interfere_with_other_objects()
-    {
-        $user = new User(['email' => 'test@user.com']);
-        $user->syncPermissions('edit-news');
-        $user->save();
-
-        $user2 = new User(['email' => 'test2@user.com']);
-        $user2->syncPermissions('edit-articles');
-        $user2->save();
-
-        $this->assertTrue($user2->fresh()->hasPermissionTo('edit-articles'));
-        $this->assertFalse($user2->fresh()->hasPermissionTo('edit-news'));
-    }
-
-    /** @test */
-    public function it_can_retrieve_permission_names()
-    {
-        $this->testUser->givePermissionTo('edit-news', 'edit-articles');
-        $this->assertEquals(
-            collect(['edit-news', 'edit-articles']),
-            $this->testUser->getPermissionNames()
-        );
-    }
-
-    /** @test */
-    public function it_can_check_many_direct_permissions()
-    {
-        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->assertTrue($this->testUser->hasAllDirectPermissions(['edit-news', 'edit-articles']));
-        $this->assertTrue($this->testUser->hasAllDirectPermissions('edit-news', 'edit-articles'));
-        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news', 'edit-blog']));
-        $this->assertFalse($this->testUser->hasAllDirectPermissions(['edit-articles', 'edit-news'], 'edit-blog'));
-    }
-
-    /** @test */
-    public function it_can_check_if_there_is_any_of_the_direct_permissions_given()
-    {
-        $this->testUser->givePermissionTo(['edit-articles', 'edit-news']);
-        $this->assertTrue($this->testUser->hasAnyDirectPermission(['edit-news', 'edit-blog']));
-        $this->assertTrue($this->testUser->hasAnyDirectPermission('edit-news', 'edit-blog'));
-        $this->assertFalse($this->testUser->hasAnyDirectPermission('edit-blog', 'Edit News', ['Edit News']));
+        $this->testRole->givePermissionTo('test.test');
     }
 }

@@ -65,17 +65,17 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_can_assign_a_role_using_an_object()
     {
-        $this->testUser->assignRole($this->testUserRole);
+        $this->testUser->assignRole($this->testRole);
 
-        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+        $this->assertTrue($this->testUser->hasRole($this->testRole));
     }
 
     /** @test */
     public function it_can_assign_a_role_using_an_id()
     {
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
 
-        $this->assertTrue($this->testUser->hasRole($this->testUserRole));
+        $this->assertTrue($this->testUser->hasRole($this->testRole));
     }
 
     /** @test */
@@ -83,7 +83,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(RoleAlreadyExists::class);
 
-        $this->testUser->assignRole($this->testUserRole->id, 'testRole2');
+        $this->testUser->assignRole($this->testRole->id, 'testRole2');
     }
 
     /** @test */
@@ -91,7 +91,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(RoleAlreadyExists::class);
 
-        $this->testUser->assignRole([$this->testUserRole->id, 'testRole2']);
+        $this->testUser->assignRole([$this->testRole->id, 'testRole2']);
     }
 
     /** @test */
@@ -99,7 +99,7 @@ class HasRolesTest extends TestCase
     {
         $this->expectException(RoleAlreadyExists::class);
 
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
         $this->testUser->assignRole('testRole2');
     }
 
@@ -109,7 +109,7 @@ class HasRolesTest extends TestCase
         // change config
         $this->app['config']->set('permission.model_has_multiple_roles', true);
 
-        $this->testUser->assignRole($this->testUserRole->id, 'testRole2');
+        $this->testUser->assignRole($this->testRole->id, 'testRole2');
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
         $this->assertTrue($this->testUser->hasRole('testRole2'));
@@ -121,7 +121,7 @@ class HasRolesTest extends TestCase
         // change config
         $this->app['config']->set('permission.model_has_multiple_roles', true);
 
-        $this->testUser->assignRole([$this->testUserRole->id, 'testRole2']);
+        $this->testUser->assignRole([$this->testRole->id, 'testRole2']);
 
         $this->assertTrue($this->testUser->hasRole('testRole'));
         $this->assertTrue($this->testUser->hasRole('testRole2'));
@@ -133,7 +133,7 @@ class HasRolesTest extends TestCase
         // change config
         $this->app['config']->set('permission.model_has_multiple_roles', true);
 
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
         $this->testUser->assignRole('testRole2');
 
         $this->assertTrue($this->testUser->hasRole('testRole2'));
@@ -145,7 +145,7 @@ class HasRolesTest extends TestCase
         // change config
         $this->app['config']->set('permission.model_has_multiple_roles', true);
 
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
 
         $this->testUser->assignRole('testRole2');
 
@@ -155,9 +155,9 @@ class HasRolesTest extends TestCase
     /** @test */
     public function it_does_not_throw_an_exception_when_assigning_a_role_that_is_already_assigned()
     {
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
 
-        $this->testUser->assignRole($this->testUserRole->id);
+        $this->testUser->assignRole($this->testRole->id);
 
         $this->assertTrue($this->testUser->fresh()->hasRole('testRole'));
     }
@@ -238,9 +238,9 @@ class HasRolesTest extends TestCase
     {
         $user = new User(['email' => 'test@user.com']);
         $user->save();
-        $user->syncRoles([$this->testUserRole]);
+        $user->syncRoles([$this->testRole]);
 
-        $this->assertTrue($user->hasRole($this->testUserRole));
+        $this->assertTrue($user->hasRole($this->testRole));
     }
 
     /** @test */
@@ -274,7 +274,7 @@ class HasRolesTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_exception_when_syncing_a_role_from_another_guard()
+    public function it_throws_an_exception_when_user_has_a_role()
     {
         $this->expectException(RoleDoesNotExist::class);
 
@@ -304,7 +304,7 @@ class HasRolesTest extends TestCase
 
         $this->assertFalse($this->testUser->hasRole($roleModel->all()));
 
-        $this->testUser->assignRole($this->testUserRole);
+        $this->testUser->assignRole($this->testRole);
 
         $this->assertTrue($this->testUser->hasRole($roleModel->all()));
 
@@ -336,7 +336,7 @@ class HasRolesTest extends TestCase
 
         $roleModel->create(['name' => 'second role', 'display_name' => 'second role']);
 
-        $this->testUser->assignRole($this->testUserRole);
+        $this->testUser->assignRole($this->testRole);
 
         $this->assertTrue($this->testUser->hasAllRoles('testRole'));
         $this->assertFalse($this->testUser->hasAllRoles(['testRole', 'second role']));
