@@ -14,11 +14,10 @@ namespace Mingzaily\Permission\Test;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Middlewares\PermissionRouteMiddleware;
 use Mingzaily\Permission\Middlewares\RoleMiddleware;
 use Mingzaily\Permission\Exceptions\UnauthorizedException;
 use Mingzaily\Permission\Middlewares\PermissionMiddleware;
+use Mingzaily\Permission\Middlewares\PermissionRouteMiddleware;
 
 class MiddlewareTest extends TestCase
 {
@@ -159,12 +158,12 @@ class MiddlewareTest extends TestCase
 
         $this->assertEquals(
             200, $this->runMiddleware(
-            $this->permissionRouteMiddleware, "/articles@PUT"
+            $this->permissionRouteMiddleware, '/articles@PUT'
         ));
 
         $this->assertEquals(
             403, $this->runMiddleware(
-            $this->permissionRouteMiddleware, "/news@PUT"
+            $this->permissionRouteMiddleware, '/news@PUT'
         ));
     }
 
