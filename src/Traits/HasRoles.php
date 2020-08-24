@@ -307,6 +307,19 @@ trait HasRoles
     }
 
     /**
+     * Traverse all roles and view role permissions
+     * get permissions.
+     *
+     * @return Collection
+     */
+    public function getPermissions()
+    {
+        return $this->roles->map(function (Role $role) {
+            return $role->getAllPermissions();
+        })->flatten();
+    }
+
+    /**
      * Forget the cached permissions.
      */
     protected function forgetCachedPermissions()
