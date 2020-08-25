@@ -12,8 +12,8 @@
 namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
 use Mingzaily\Permission\Exceptions\PermissionNotMenu;
+use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
 
 class PermissionTest extends TestCase
 {

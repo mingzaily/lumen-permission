@@ -11,9 +11,9 @@
 
 namespace Mingzaily\Permission\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
@@ -82,7 +82,7 @@ trait HasRoles
             $roles = [$roles];
         }
 
-        $roles = array_map(function ($role) use ($guard) {
+        $roles = array_map(function ($role) {
             if ($role instanceof Role) {
                 return $role;
             }
@@ -96,7 +96,6 @@ trait HasRoles
             $subQuery->whereIn(config('permission.table_names.roles').'.id', array_column($roles, 'id'));
         });
     }
-
 
     /**
      * Return a model have one of the role.
