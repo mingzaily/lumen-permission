@@ -14,7 +14,6 @@ namespace Mingzaily\Permission\Test;
 use Mingzaily\Permission\Contracts\Role;
 use Mingzaily\Permission\Models\Permission;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
-use Mingzaily\Permission\Exceptions\GuardDoesNotMatch;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 

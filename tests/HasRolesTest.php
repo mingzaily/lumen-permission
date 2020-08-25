@@ -375,7 +375,6 @@ class HasRolesTest extends TestCase
         $this->assertEquals(1, $scopedUsers3->count());
     }
 
-
     /** @test */
     public function it_can_determine_that_a_user_has_one_of_the_given_roles()
     {
