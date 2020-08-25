@@ -45,7 +45,7 @@ class GateTest extends TestCase
 
         $this->assertTrue($this->testUser->can($this->testPermission->name));
 
-        $this->assertTrue($this->testUser->can($this->testPermission->route.'|'.$this->testPermission->method));
+        $this->assertTrue($this->testUser->can($this->testPermission->route.'@'.$this->testPermission->method));
 
         $this->assertFalse($this->testUser->can('non-existing-permission'));
 

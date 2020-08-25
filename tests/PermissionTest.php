@@ -13,45 +13,44 @@ namespace Mingzaily\Permission\Test;
 
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
+use Mingzaily\Permission\Exceptions\PermissionNotMenu;
 
 class PermissionTest extends TestCase
 {
     /** @test */
-    public function it_throws_an_exception_when_the_permission_already_exists()
+    public function it_throws_an_exception_when_the_permission_already_exists_same_name()
     {
         $this->expectException(PermissionAlreadyExists::class);
 
-        app(Permission::class)->create(['name' => 'test-permission']);
-        app(Permission::class)->create(['name' => 'test-permission']);
+        app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'route' => '/permission', 'method' => 'POST']);
+        app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'route' => '/permission', 'method' => 'POST']);
     }
 
     /** @test */
-    public function it_belongs_to_a_guard()
+    public function it_throws_an_exception_when_the_permission_already_exists_same_route_method()
     {
-        $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
+        $this->expectException(PermissionAlreadyExists::class);
 
-        $this->assertEquals('admin', $permission->guard_name);
+        app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'route' => '/permission', 'method' => 'POST']);
+        app(Permission::class)->create(['name' => 'test.permission2', 'display_name' => 'test.permission2', 'route' => '/permission', 'method' => 'POST']);
     }
 
     /** @test */
-    public function it_belongs_to_the_default_guard_by_default()
+    public function it_throws_an_exception_when_the_permission_not_menu()
     {
-        $this->assertEquals(
-            $this->app['config']->get('auth.defaults.guard'),
-            $this->testPermission->guard_name
-        );
+        $this->expectException(PermissionNotMenu::class);
+
+        app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission']);
     }
 
     /** @test */
-    public function it_has_user_models_of_the_right_class()
+    public function it_not_throws_an_exception_when_the_permission_not_menu()
     {
-        $this->testAdmin->givePermissionTo($this->testAdminPermission);
+        app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'is_menu' => 1]);
 
-        $this->testUser->givePermissionTo($this->testPermission);
+        $permission = app(Permission::class)->findByName('test.permission');
 
-        $this->assertCount(1, $this->testPermission->users);
-        $this->assertTrue($this->testPermission->users->first()->is($this->testUser));
-        $this->assertInstanceOf(User::class, $this->testPermission->users->first());
+        $this->assertEquals('test.permission', $permission->name);
     }
 
     /** @test */

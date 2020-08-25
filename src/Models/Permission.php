@@ -71,30 +71,25 @@ class Permission extends Model implements PermissionContract
 
     public static function create(array $attributes = [])
     {
-        if (! isset($attributes['is_menu'])
-            && (! isset($attributes['route']) || ! isset($attributes['method']))) {
-            throw PermissionNotMenu::notMenu($attributes['name']);
+        if (! isset($attributes['is_menu'])) {
+            if (! isset($attributes['route']) || ! isset($attributes['method'])) {
+                throw PermissionNotMenu::notMenu($attributes['name']);
+            }
+
+            $permission = static::getPermissions([
+                'route' => $attributes['route'],
+                'method' => $attributes['method'],
+            ])->first();
+
+            if ($permission) {
+                throw PermissionAlreadyExists::routeMethod($attributes['route'], $attributes['method']);
+            }
         }
 
         $permission = static::getPermissions(['name' => $attributes['name']])->first();
 
         if ($permission) {
             throw PermissionAlreadyExists::name($attributes['name']);
-        }
-
-        $permission = static::getPermissions(['display_name' => $attributes['display_name']])->first();
-
-        if ($permission) {
-            throw PermissionAlreadyExists::name($attributes['name']);
-        }
-
-        $permission = static::getPermissions([
-            'route' => $attributes['route'],
-            'method' => $attributes['method'],
-        ])->first();
-
-        if ($permission) {
-            throw PermissionAlreadyExists::routeMethod($attributes['route'], $attributes['method']);
         }
 
         return static::query()->create($attributes);
@@ -149,6 +144,7 @@ class Permission extends Model implements PermissionContract
     public static function findByName(string $name): PermissionContract
     {
         $permission = static::getPermissions(['name' => $name])->first();
+
         if (! $permission) {
             throw PermissionDoesNotExist::create($name);
         }
@@ -199,15 +195,19 @@ class Permission extends Model implements PermissionContract
      */
     public static function findOrCreate(array $attributes): PermissionContract
     {
-        $permission = static::getPermissions([
-            'name' => $attributes['name'],
-            'display_name' => $attributes['display_name'],
-            'route' => $attributes['route'],
-            'method' => $attributes['method'],
-        ])->first();
+        $permission = static::getPermissions(['name' => $attributes['name']])->first();
+
+        if (! $permission
+            && isset($attributes['route'])
+            && isset($attributes['method'])) {
+            $permission = static::getPermissions([
+                'route' => $attributes['route'],
+                'method' => $attributes['method'],
+            ])->first();
+        }
 
         if (! $permission) {
-            return static::create();
+            return static::create($attributes);
         }
 
         return $permission;
