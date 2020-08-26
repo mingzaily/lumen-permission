@@ -16,7 +16,7 @@ use Mingzaily\Permission\Exceptions\UnauthorizedException;
 
 class PermissionRouteMiddleware
 {
-    public function handle($request, Closure $next, $ability)
+    public function handle($request, Closure $next, $ability = null)
     {
         if (app('auth')->guest()) {
             throw UnauthorizedException::notLoggedIn();
