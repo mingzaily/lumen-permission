@@ -13,6 +13,7 @@ namespace Mingzaily\Permission\Traits;
 
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\Contracts\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
@@ -60,6 +61,40 @@ trait HasRoles
             config('permission.column_names.model_morph_key'),
             'role_id'
         );
+    }
+
+    /**
+     * Scope the model query to certain roles only.
+     *
+     * @param Builder $query
+     * @param string|array|Role|Collection $roles
+     * @param string $guard
+     *
+     * @return Builder
+     */
+    public function scopeRole(Builder $query, $roles, $guard = null): Builder
+    {
+        if ($roles instanceof Collection) {
+            $roles = $roles->all();
+        }
+
+        if (! is_array($roles)) {
+            $roles = [$roles];
+        }
+
+        $roles = array_map(function ($role) {
+            if ($role instanceof Role) {
+                return $role;
+            }
+
+            $method = is_numeric($role) ? 'findById' : 'findByName';
+
+            return $this->getRoleClass()->{$method}($role);
+        }, $roles);
+
+        return $query->whereHas('roles', function (Builder $subQuery) use ($roles) {
+            $subQuery->whereIn(config('permission.table_names.roles').'.id', array_column($roles, 'id'));
+        });
     }
 
     /**
