@@ -65,6 +65,8 @@ trait HasRoles
     /**
      * Return a model have one of the role.
      * alias roles().
+     *
+     * @return Role
      */
     public function getFirstRole(): Role
     {

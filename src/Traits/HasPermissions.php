@@ -127,7 +127,7 @@ trait HasPermissions
      */
     public function givePermissionTo(...$permissions)
     {
-        $permissions = collect($permissions)
+        $allPermissions = collect($permissions)
             ->flatten()
             ->map(function ($permission) {
                 if (empty($permission)) {
@@ -138,11 +138,20 @@ trait HasPermissions
             })
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
+            });
+
+        $syncPermissions = $allPermissions
+            ->filter(function ($permission) use ($allPermissions) {
+                if ($permission->pid == null) {
+                    return true;
+                }
+
+                return $this->checkPermissionTo($permission->pid) || in_array($permission->pid, $allPermissions->map->id->all());
             })
             ->map->id
             ->all();
 
-        $this->permissions()->sync($permissions, false);
+        $this->permissions()->sync($syncPermissions, false);
         $this->load('permissions');
 
         $this->forgetCachedPermissions();

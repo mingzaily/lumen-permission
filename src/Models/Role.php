@@ -162,7 +162,7 @@ class Role extends Model implements RoleContract
 
         $bool = $this->permissions->contains('id', $permission->id);
 
-        if ($permission->is_menu) {
+        if ($permission->is_menu && $bool) {
             throw PermissionIsMenu::isMenu($permission->name);
         }
 
