@@ -146,7 +146,8 @@ trait HasPermissions
                     return true;
                 }
 
-                return $this->checkPermissionTo($permission->pid) || in_array($permission->pid, $allPermissions->map->id->all());
+                return $this->checkPermissionTo((int)$permission->pid) ||
+                    in_array($permission->pid, $allPermissions->map->id->all());
             })
             ->map->id
             ->all();
