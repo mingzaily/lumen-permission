@@ -11,8 +11,8 @@
 
 namespace Mingzaily\Permission\Test;
 
-use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Contracts\Role;
+use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
 class HasPermissionsTest extends TestCase
@@ -50,7 +50,7 @@ class HasPermissionsTest extends TestCase
     public function it_cannot_given_sub_permissions_that_have_not_been_granted_of_role()
     {
         $menu = app(Permission::class)->create(['name' => 'test.menu', 'display_name' => 'test.menu', 'is_menu' => 1]);
-        $permission = app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'pid' => $menu->id ,'is_menu' => 1]);
+        $permission = app(Permission::class)->create(['name' => 'test.permission', 'display_name' => 'test.permission', 'pid' => $menu->id, 'is_menu' => 1]);
 
         $this->testRole->givePermissionTo($permission->id);
 
