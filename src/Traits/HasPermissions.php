@@ -212,7 +212,7 @@ trait HasPermissions
     }
 
     /**
-     * change list permissions to tree
+     * change list permissions to tree.
      *
      * @param null $pid
      * @param null $allPermissions
