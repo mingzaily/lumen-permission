@@ -201,14 +201,27 @@ trait HasPermissions
     /**
      * Return all the tree permissions the model has via roles.
      *
+     * @param string $attributeName
+     * @param string $columns
+     */
+    public function setTreePermissions(string $attributeName, string $columns)
+    {
+        $columns = explode(',', $columns);
+        $columns = array_merge($columns, ['pid', 'is_menu']);
+        $this->$attributeName = $this->getPermissionsTree(null, $this->permissions()->get($columns));
+    }
+
+    /**
+     * change list permissions to tree
+     *
      * @param null $pid
      * @param null $allPermissions
      * @return Collection
      */
-    public function getTreePermissions($pid = null, $allPermissions = null): Collection
+    public function getPermissionsTree($pid = null, $allPermissions = null): Collection
     {
         if (is_null($allPermissions)) {
-            $allPermissions = $this->getAllPermissions();
+            $allPermissions = $this->permissions()->get();
         }
 
         return $allPermissions
@@ -220,7 +233,7 @@ trait HasPermissions
                     return $data;
                 }
 
-                $data['children_permissions'] = $this->getTreePermissions($permission->id, $allPermissions)
+                $data['children'] = $this->getPermissionsTree($permission->id, $allPermissions)
                     ->sortByDesc('weight')
                     ->values();
 
