@@ -1,5 +1,9 @@
 language: php
 
+branches:
+    only:
+        - /^v\d+(\.\d+){0,2}/
+
 php:
     - 7.2
     - 7.3
