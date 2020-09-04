@@ -75,7 +75,7 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * create permission
+     * create permission.
      *
      * @param array $attributes
      * @return static
