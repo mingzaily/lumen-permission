@@ -201,44 +201,15 @@ trait HasPermissions
     /**
      * Return all the tree permissions the model has via roles.
      *
-     * @param string $attributeName
-     * @param string $columns
+     * @param string $attributeName You want to set name.
+     * @param string $columns You want to get columns.
      */
-    public function setTreePermissions(string $attributeName, string $columns)
+    public function getTreePermissions(string $attributeName, string $columns)
     {
         $columns = explode(',', $columns);
-        $columns = array_merge($columns, ['pid', 'is_menu']);
-        $this->$attributeName = $this->getPermissionsTree(null, $this->permissions()->get($columns));
-    }
+        $columns = array_merge($columns, ['id', 'pid', 'is_menu']);
 
-    /**
-     * change list permissions to tree.
-     *
-     * @param null $pid
-     * @param null $allPermissions
-     * @return Collection
-     */
-    public function getPermissionsTree($pid = null, $allPermissions = null): Collection
-    {
-        if (is_null($allPermissions)) {
-            $allPermissions = $this->permissions()->get();
-        }
-
-        return $allPermissions
-            ->where('pid', $pid)
-            ->map(function (Permission $permission) use ($allPermissions) {
-                $data = $permission;
-
-                if (! $permission->is_menu) {
-                    return $data;
-                }
-
-                $data['children'] = $this->getPermissionsTree($permission->id, $allPermissions)
-                    ->sortByDesc('weight')
-                    ->values();
-
-                return $data;
-            })->sortByDesc('weight')->values();
+        $this->$attributeName = setTree(null, $this->permissions()->get($columns));
     }
 
     /**

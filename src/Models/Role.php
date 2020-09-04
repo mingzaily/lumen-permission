@@ -53,6 +53,11 @@ class Role extends Model implements RoleContract
 
     protected $hidden = ['pivot'];
 
+    /**
+     * Role constructor.
+     *
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -60,7 +65,13 @@ class Role extends Model implements RoleContract
         $this->setTable(config('permission.table_names.roles'));
     }
 
-    public static function create(array $attributes = [])
+    /**
+     * Create Role.
+     *
+     * @param array $attributes
+     * @return static
+     */
+    public static function create(array $attributes = []): self
     {
         if (static::where('name', $attributes['name'])->first()) {
             throw RoleAlreadyExists::create($attributes['name']);
@@ -71,6 +82,8 @@ class Role extends Model implements RoleContract
 
     /**
      * A role belongs to some users of the model.
+     *
+     * @return MorphToMany
      */
     public function users(): MorphToMany
     {

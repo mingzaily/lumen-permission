@@ -198,7 +198,7 @@ class AuthServiceProvider extends ServiceProvider
   - 删除 `guard_name`字段
 - 修改`role`表结构
   - 添加 `display_name`字段
-  - Delete filed `guard_name`
+  - 删除 `guard_name`
 - 移出`model_has_permission`表格，移出`model`的直接权限
 - 移出Laravel blade模板支持（如需要，请使用 [spatie/laravel-permission](https://github.com/spatie/laravel-permission)）
 - 移出Guard看守器配置

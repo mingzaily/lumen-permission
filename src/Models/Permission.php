@@ -62,6 +62,11 @@ class Permission extends Model implements PermissionContract
 
     protected $hidden = ['pivot'];
 
+    /**
+     * Permission constructor.
+     *
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -69,7 +74,13 @@ class Permission extends Model implements PermissionContract
         $this->setTable(config('permission.table_names.permissions'));
     }
 
-    public static function create(array $attributes = [])
+    /**
+     * create permission
+     *
+     * @param array $attributes
+     * @return static
+     */
+    public static function create(array $attributes = []): self
     {
         if (! isset($attributes['is_menu'])) {
             if (! isset($attributes['route']) || ! isset($attributes['method'])) {
@@ -97,6 +108,8 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission can be belongs to any roles.
+     *
+     * @return BelongsToMany
      */
     public function roles(): BelongsToMany
     {
@@ -116,23 +129,6 @@ class Permission extends Model implements PermissionContract
     private function children()
     {
         return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
-    }
-
-    /**
-     * @return HasMany
-     */
-    private function childrenPermissions()
-    {
-        return $this->children()
-            ->with('childrenPermissions')
-            ->orderBy('weight', 'desc');
-    }
-
-    public function TreeList()
-    {
-        return self::with('childrenPermissions')
-            ->whereNull('pid')
-            ->orderBy('weight', 'desc');
     }
 
     /**
