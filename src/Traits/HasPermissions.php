@@ -209,7 +209,7 @@ trait HasPermissions
         $columns = explode(',', $columns);
         $columns = array_merge($columns, ['id', 'pid', 'is_menu']);
 
-        $this->$attributeName = setTree(null, $this->permissions()->get($columns));
+        $this->$attributeName = setTree($this->permissions()->get($columns));
     }
 
     /**
