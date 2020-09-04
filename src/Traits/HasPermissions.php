@@ -202,12 +202,13 @@ trait HasPermissions
      * Return all the tree permissions the model has via roles.
      *
      * @param string $attributeName You want to set name.
-     * @param string $columns You want to get columns.
+     * @param array $columns You want to get columns.
      */
-    public function getTreePermissions(string $attributeName, string $columns)
+    public function getTreePermissions(string $attributeName = 'tree_permissions', array $columns = ['*'])
     {
-        $columns = explode(',', $columns);
-        $columns = array_merge($columns, ['id', 'pid', 'is_menu']);
+        if (!in_array('*', $columns)) {
+            $columns = array_merge($columns, ['id', 'pid', 'is_menu']);
+        }
 
         $this->$attributeName = setTree($this->permissions()->get($columns));
     }
