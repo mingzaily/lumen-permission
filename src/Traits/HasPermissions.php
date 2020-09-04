@@ -206,7 +206,7 @@ trait HasPermissions
      */
     public function getTreePermissions(string $attributeName = 'tree_permissions', array $columns = ['*'])
     {
-        if (!in_array('*', $columns)) {
+        if (! in_array('*', $columns)) {
             $columns = array_merge($columns, ['id', 'pid', 'is_menu']);
         }
 
