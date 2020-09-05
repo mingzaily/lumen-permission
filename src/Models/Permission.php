@@ -82,7 +82,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function create(array $attributes = []): self
     {
-        $attributes['is_menu'] = isset($attributes['is_menu']) ?? 0;
+        $attributes['is_menu'] = isset($attributes['is_menu']) ? $attributes['is_menu'] : 0;
         if ($attributes['is_menu'] == 0) {
             if (! isset($attributes['route']) || ! isset($attributes['method'])) {
                 throw PermissionNotMenu::notMenu($attributes['name']);
