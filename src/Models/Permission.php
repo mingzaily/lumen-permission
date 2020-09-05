@@ -11,11 +11,10 @@
 
 namespace Mingzaily\Permission\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Mingzaily\Permission\PermissionRegistrar;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mingzaily\Permission\Exceptions\PermissionNotMenu;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
