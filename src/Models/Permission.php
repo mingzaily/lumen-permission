@@ -13,6 +13,7 @@ namespace Mingzaily\Permission\Models;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Mingzaily\Permission\PermissionRegistrar;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mingzaily\Permission\Exceptions\PermissionNotMenu;
@@ -82,10 +83,13 @@ class Permission extends Model implements PermissionContract
      */
     public static function create(array $attributes = []): self
     {
-        if (! isset($attributes['is_menu'])) {
+        if (isset($attributes['is_menu']) && $attributes['is_menu'] == 0) {
             if (! isset($attributes['route']) || ! isset($attributes['method'])) {
                 throw PermissionNotMenu::notMenu($attributes['name']);
             }
+
+            $attributes['route'] = Str::start($attributes['route'], '/');
+            $attributes['method'] = strtoupper($attributes['method']);
 
             $permission = static::getPermissions([
                 'route' => $attributes['route'],
@@ -119,16 +123,6 @@ class Permission extends Model implements PermissionContract
             'permission_id',
             'role_id'
         );
-    }
-
-    /**
-     * Recursive hasMany Relationship with Unlimited Subcategories.
-     *
-     * @return HasMany
-     */
-    private function children()
-    {
-        return $this->hasMany(config('permission.models.permission'), 'pid', 'id');
     }
 
     /**
@@ -174,7 +168,7 @@ class Permission extends Model implements PermissionContract
      */
     public static function findByRouteAndMethod(string $route, string $method): PermissionContract
     {
-        $ability = ['route' => $route, 'method' => $method];
+        $ability = ['route' => Str::start($route, '/'), 'method' => strtoupper($method)];
         $permission = static::getPermissions($ability)->first();
 
         if (! $permission) {
@@ -185,7 +179,7 @@ class Permission extends Model implements PermissionContract
     }
 
     /**
-     * Find or create permission by its name (and optionally guardName).
+     * Find or create permission by its name.
      * @param array $attributes
      * @return PermissionContract
      */
