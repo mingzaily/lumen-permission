@@ -46,7 +46,7 @@ interface Permission
     public static function findByRouteAndMethod(string $route, string $method): self;
 
     /**
-     * Find or Create a permission by its name and guard name.
+     * Find or Create a permission by its name.
      *
      * @param array $attributes
      * @return Permission

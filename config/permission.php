@@ -44,12 +44,11 @@ return [
         'roles' => 'roles',
 
         /*
-         * When using the "HasPermissions" trait from this package, we need to know which
-         * table should be used to retrieve your permissions. We have chosen a basic
-         * default value but you may easily change it to any table you like.
+         * You can customize the Menu table name and permission table name.
          */
-
         'permissions' => 'permissions',
+
+        'menus' => 'menus',
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -66,6 +65,14 @@ return [
          */
 
         'role_has_permissions' => 'role_has_permissions',
+
+        /*
+         * When using the "HasRoles" trait from this package, we need to know which
+         * table should be used to retrieve your roles menus. We have chosen a
+         * basic default value but you may easily change it to any table you like.
+         */
+
+        'role_has_menus' => 'role_has_menus',
     ],
 
     'column_names' => [
@@ -113,7 +120,13 @@ return [
          * The cache key used to store all permissions.
          */
 
-        'key' => 'mingzaily.permission.cache',
+        'permission_key' => 'mingzaily.permission.permission_cache',
+
+        /*
+         * The cache key used to store all menus.
+         */
+
+        'menu_key' => 'mingzaily.permission.menu_cache',
 
         /*
          * When checking for a permission against a model by passing a Permission

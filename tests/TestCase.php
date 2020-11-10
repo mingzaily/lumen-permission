@@ -11,6 +11,8 @@
 
 namespace Mingzaily\Permission\Test;
 
+use Exception;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Mingzaily\Permission\Contracts\Role;
@@ -31,6 +33,9 @@ abstract class TestCase extends Orchestra
     /** @var \Mingzaily\Permission\Models\Permission */
     protected $testPermission;
 
+    /**
+     * @throws Exception
+     */
     public function setUp(): void
     {
         parent::setUp();
@@ -44,7 +49,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return array
      */
@@ -58,7 +63,7 @@ abstract class TestCase extends Orchestra
     /**
      * Set up the environment.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -82,7 +87,8 @@ abstract class TestCase extends Orchestra
     /**
      * Set up the database.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
+     * @throws Exception
      */
     protected function setUpDatabase($app)
     {
@@ -98,7 +104,7 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
-        include_once __DIR__.'/../database/migrations/create_permission_tables.php.stub';
+        include_once __DIR__ . '/../database/migrations/2020_01_01_000000_create_permission_tables.php';
 
         (new \CreatePermissionTables())->up();
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the mingzaily/lumen-permission.
+ * This file is part of the mingzaily/lumen-Menu.
  *
  * (c) mingzaily <mingzaily@163.com>
  *
@@ -13,42 +13,34 @@ namespace Mingzaily\Permission\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-interface Role
+interface Menu
 {
     /**
-     * A role may be given various permissions.
+     * A Menu can be applied to roles.
      */
-    public function permissions(): BelongsToMany;
+    public function roles(): BelongsToMany;
 
     /**
-     * Find a role by its name.
+     * Find a Menu by its name.
      *
      * @param string $name
-     * @return Role
+     * @return Menu
      */
     public static function findByName(string $name): self;
 
     /**
-     * Find a role by its id.
+     * Find a Menu by its id.
      *
      * @param int $id
-     * @return Role
+     * @return Menu
      */
     public static function findById(int $id): self;
 
     /**
-     * Find or create a role by its name.
+     * Find or Create a Menu by its name.
      *
      * @param array $attributes
-     * @return Role
+     * @return Menu
      */
     public static function findOrCreate(array $attributes): self;
-
-    /**
-     * Determine if the user may perform the given permission.
-     *
-     * @param string|Permission $permission
-     * @return bool
-     */
-    public function hasPermissionTo($permission): bool;
 }

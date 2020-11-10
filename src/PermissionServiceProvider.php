@@ -22,7 +22,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         // Please copy files manually
         // config/permission.php
-        // database/migrations/create_permission_tables.php.stub
+        // database/migrations/2020_01_01_000000_create_permission_tables.php
 
         $this->commands([
             Commands\CacheReset::class,
@@ -32,6 +32,7 @@ class PermissionServiceProvider extends ServiceProvider
         $this->registerModelBindings();
 
         $permissionLoader->clearClassPermissions();
+        $permissionLoader->clearClassMenus();
         $permissionLoader->registerPermissions();
 
         $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {

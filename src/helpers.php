@@ -9,15 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
+use Illuminate\Support\Collection;
+
 if (! function_exists('setTree')) {
     /**
      * change list to tree.
      *
-     * @param \Illuminate\Support\Collection $allPermissions
+     * @param Collection $allPermissions
      * @param null $pid
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    function setTree(\Illuminate\Support\Collection $allPermissions, $pid = null): \Illuminate\Support\Collection
+    function setTree(Collection $allPermissions, $pid = null): Collection
     {
         return $allPermissions
             ->where('pid', $pid)

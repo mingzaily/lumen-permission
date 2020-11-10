@@ -13,6 +13,7 @@ namespace Mingzaily\Permission;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
+use Mingzaily\Permission\Contracts\Menu;
 use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Cache\Repository;
@@ -33,14 +34,23 @@ class PermissionRegistrar
     /** @var string */
     protected $roleClass;
 
+    /** @var string */
+    protected $menuClass;
+
     /** @var Collection */
     protected $permissions;
+
+    /** @var Collection */
+    protected $menus;
 
     /** @var \DateInterval|int */
     public static $cacheExpirationTime;
 
     /** @var string */
-    public static $cacheKey;
+    public static $permissionCacheKey;
+
+    /** @var string */
+    public static $menuCacheKey;
 
     /** @var string */
     public static $cacheModelKey;
@@ -63,7 +73,8 @@ class PermissionRegistrar
     {
         self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
 
-        self::$cacheKey = config('permission.cache.key');
+        self::$permissionCacheKey = config('permission.cache.permission_key');
+        self::$menuCacheKey = config('permission.cache.menu_key');
         self::$cacheModelKey = config('permission.cache.model_key');
 
         $this->cache = $this->getCacheStoreFromConfig();
@@ -110,13 +121,23 @@ class PermissionRegistrar
     }
 
     /**
-     * Flush the cache.
+     * Flush the permission cache.
      */
     public function forgetCachedPermissions()
     {
         $this->permissions = null;
 
-        return $this->cache->forget(self::$cacheKey);
+        return $this->cache->forget(self::$permissionCacheKey);
+    }
+
+    /**
+     * Flush the menu cache.
+     */
+    public function forgetCachedMenus()
+    {
+        $this->menus = null;
+
+        return $this->cache->forget(self::$menuCacheKey);
     }
 
     /**
@@ -130,6 +151,16 @@ class PermissionRegistrar
     }
 
     /**
+     * Clear class menus.
+     * This is only intended to be called by the PermissionServiceProvider on boot,
+     * so that long-running instances like Swoole don't keep old data in memory.
+     */
+    public function clearClassMenus()
+    {
+        $this->menus = null;
+    }
+
+    /**
      * Get the permissions based on the passed params.
      *
      * @param array $params
@@ -138,7 +169,7 @@ class PermissionRegistrar
     public function getPermissions(array $params = []): Collection
     {
         if (null === $this->permissions) {
-            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+            $this->permissions = $this->cache->remember(self::$permissionCacheKey, self::$cacheExpirationTime, function () {
                 return $this->getPermissionClass()
                     ->with('roles')
                     ->get();
@@ -155,6 +186,31 @@ class PermissionRegistrar
     }
 
     /**
+     * Get the permissions based on the passed params.
+     *
+     * @param array $params
+     * @return Collection
+     */
+    public function getMenus(array $params = []): Collection
+    {
+        if (null === $this->menus) {
+            $this->menus = $this->cache->remember(self::$menuCacheKey, self::$cacheExpirationTime, function () {
+                return $this->getMenuClass()
+                    ->with('roles')
+                    ->get();
+            });
+        }
+
+        $menus = clone $this->menus;
+
+        foreach ($params as $attr => $value) {
+            $menus = $menus->where($attr, $value);
+        }
+
+        return $menus;
+    }
+
+    /**
      * Get an instance of the permission class.
      */
     public function getPermissionClass(): Permission
@@ -165,6 +221,21 @@ class PermissionRegistrar
     public function setPermissionClass($permissionClass)
     {
         $this->permissionClass = $permissionClass;
+
+        return $this;
+    }
+
+    /**
+     * Get an instance of the permission class.
+     */
+    public function getMenuClass(): Menu
+    {
+        return app($this->menuClass);
+    }
+
+    public function setMenuClass($menuClass)
+    {
+        $this->menuClass = $menuClass;
 
         return $this;
     }

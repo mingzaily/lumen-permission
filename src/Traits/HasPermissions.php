@@ -74,8 +74,6 @@ trait HasPermissions
             return $this->hasPermissionTo($permission);
         } catch (PermissionDoesNotExist $e) {
             return false;
-        } catch (PermissionIsMenu $e) {
-            return true;
         }
     }
 
@@ -138,21 +136,11 @@ trait HasPermissions
             })
             ->filter(function ($permission) {
                 return $permission instanceof Permission;
-            });
-
-        $syncPermissions = $allPermissions
-            ->filter(function ($permission) use ($allPermissions) {
-                if ($permission->pid == null) {
-                    return true;
-                }
-
-                return $this->checkPermissionTo((int) $permission->pid) ||
-                    in_array($permission->pid, $allPermissions->map->id->all());
             })
             ->map->id
             ->all();
 
-        $this->permissions()->sync($syncPermissions, false);
+        $this->permissions()->sync($allPermissions, false);
         $this->load('permissions');
 
         $this->forgetCachedPermissions();

@@ -22,28 +22,6 @@ use Mingzaily\Permission\Contracts\Role as RoleContract;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
-/**
- * Mingzaily\Permission\Models\Role.
- *
- * @property int                                                         $id
- * @property string                                                      $name
- * @property string                                                      $display_name
- * @property \Illuminate\Support\Carbon|null                             $created_at
- * @property \Illuminate\Support\Carbon|null                             $updated_at
- * @property \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
- * @property int|null                                                    $users_count
- *
- * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Role permission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder|Role query()
- * @method static \Illuminate\Database\Eloquent\Builder|Role whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Role whereDisplayName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Role whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Role whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Role extends Model implements RoleContract
 {
     use HasPermissions;
@@ -106,7 +84,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('name', $name)->first();
 
-        if (! $role) {
+        if (!$role) {
             throw RoleDoesNotExist::named($name);
         }
 
@@ -123,7 +101,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('id', $id)->first();
 
-        if (! $role) {
+        if (!$role) {
             throw RoleDoesNotExist::withId($id);
         }
 
@@ -140,7 +118,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where(['name' => $attributes['name']])->first();
 
-        if (! $role) {
+        if (!$role) {
             return static::query()->create($attributes);
         }
 
@@ -169,16 +147,10 @@ class Role extends Model implements RoleContract
             $permission = $permissionClass->findByRouteAndMethod($permission['route'], $permission['method']);
         }
 
-        if (! $permission instanceof Permission) {
+        if (!$permission instanceof Permission) {
             throw new PermissionDoesNotExist();
         }
 
-        $bool = $this->permissions->contains('id', $permission->id);
-
-        if ($permission->is_menu && $bool) {
-            throw PermissionIsMenu::isMenu($permission->name);
-        }
-
-        return $bool;
+        return $this->permissions->contains('id', $permission->id);
     }
 }
