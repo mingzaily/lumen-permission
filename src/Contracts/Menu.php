@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the mingzaily/lumen-Menu.
+ * This file is part of the mingzaily/lumen-permission.
  *
  * (c) mingzaily <mingzaily@163.com>
  *

@@ -11,15 +11,14 @@
 
 namespace Mingzaily\Permission\Models;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\PermissionRegistrar;
+use Mingzaily\Permission\Contracts\Menu as MenuContract;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Traits\RefreshesPermissionCache;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 use Mingzaily\Permission\Exceptions\PermissionAlreadyExists;
-use Mingzaily\Permission\Contracts\Menu as MenuContract;
 
 class Menu extends Model implements MenuContract
 {

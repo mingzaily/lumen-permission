@@ -15,7 +15,6 @@ use Exception;
 use Illuminate\Support\Collection;
 use Mingzaily\Permission\PermissionRegistrar;
 use Mingzaily\Permission\Contracts\Permission;
-use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mingzaily\Permission\Exceptions\PermissionDoesNotExist;
 
