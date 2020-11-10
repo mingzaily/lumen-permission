@@ -14,7 +14,6 @@ namespace Mingzaily\Permission\Models;
 use Illuminate\Database\Eloquent\Model;
 use Mingzaily\Permission\Contracts\Permission;
 use Mingzaily\Permission\Traits\HasPermissions;
-use Mingzaily\Permission\Exceptions\PermissionIsMenu;
 use Mingzaily\Permission\Exceptions\RoleDoesNotExist;
 use Mingzaily\Permission\Exceptions\RoleAlreadyExists;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -84,7 +83,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('name', $name)->first();
 
-        if (!$role) {
+        if (! $role) {
             throw RoleDoesNotExist::named($name);
         }
 
@@ -101,7 +100,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where('id', $id)->first();
 
-        if (!$role) {
+        if (! $role) {
             throw RoleDoesNotExist::withId($id);
         }
 
@@ -118,7 +117,7 @@ class Role extends Model implements RoleContract
     {
         $role = static::where(['name' => $attributes['name']])->first();
 
-        if (!$role) {
+        if (! $role) {
             return static::query()->create($attributes);
         }
 
@@ -147,7 +146,7 @@ class Role extends Model implements RoleContract
             $permission = $permissionClass->findByRouteAndMethod($permission['route'], $permission['method']);
         }
 
-        if (!$permission instanceof Permission) {
+        if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist();
         }
 

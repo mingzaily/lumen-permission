@@ -12,8 +12,8 @@
 namespace Mingzaily\Permission\Test;
 
 use Exception;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Schema;
 use Mingzaily\Permission\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
@@ -104,7 +104,7 @@ abstract class TestCase extends Orchestra
             $this->createCacheTable();
         }
 
-        include_once __DIR__ . '/../database/migrations/2020_01_01_000000_create_permission_tables.php';
+        include_once __DIR__.'/../database/migrations/2020_01_01_000000_create_permission_tables.php';
 
         (new \CreatePermissionTables())->up();
 
